@@ -4,6 +4,8 @@
 [![Coverage](https://codecov.io/gh/willirath/rasmus_fuel/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/github/willirath/rasmus_fuel?branch=master)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/willirath/rasmus_fuel/master?filepath=doc%2Fexamples)
 
+Fuel consumption paramerterisations for RASMUS.
+
 ## Install
 
 ...
