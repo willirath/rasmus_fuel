@@ -22,7 +22,7 @@ def test_simplest_power_maintain_sog_no_drag():
             v_ship_og=v_ship_og,
             u_current=u_current,
             v_current=v_current,
-            drag_coeff=0,
+            coeff=0,
         ),
     )
 
