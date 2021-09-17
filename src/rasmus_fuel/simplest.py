@@ -8,6 +8,7 @@ def power_maintain_sog(
     u_current: npt.ArrayLike = None,
     v_current: npt.ArrayLike = None,
     drag_coeff: float = 1.0,
+    **kwargs,
 ):
     """Calculate quadratic drag law power needed to maintain speed over ground.
 
@@ -26,6 +27,8 @@ def power_maintain_sog(
         Needs shape that can be broadcast to shape of u_ship and v_ship.
     drag_coeff: float
         Drag coefficient in arbitrary units.
+
+    All other keyword arguments will be ignored.
 
     Returns
     -------

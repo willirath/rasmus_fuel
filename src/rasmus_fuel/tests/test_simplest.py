@@ -42,3 +42,11 @@ def test_simplest_power_maintain_sog_errors():
     with pytest.raises(ValueError) as execinfo:
         power_maintain_sog(u_ship=u_ship, v_ship=v_ship, u_current=0, v_current=0)
     assert str(execinfo.value) == 'Shape of u_ship and v_ship need to agree.'
+
+
+def test_simplest_power_maintain_sog_kwargs_ignored():
+    """Check that arbitrary kwargs are ignored."""
+    np.testing.assert_equal(
+        power_maintain_sog(u_ship=1, v_ship=1, u_current=0, v_current=0, nonexisting_kwarg=1234),
+        power_maintain_sog(u_ship=1, v_ship=1, u_current=0, v_current=0),
+    )
