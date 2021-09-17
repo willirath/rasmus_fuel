@@ -59,7 +59,7 @@ def power_maintain_sog(
 
 
 def power_to_fuel_burning_rate(
-    power: npt.ArrayLike = None, efficiency: float = 0.1, fuel_value: float = 42.0e6
+    power: npt.ArrayLike = None, efficiency: float = 0.5, fuel_value: float = 42.0e6
 ):
     """Convert power to fuel buring rate.
 
@@ -68,7 +68,7 @@ def power_to_fuel_burning_rate(
     power: array
         Power in W (=kg*m2/s3).
     efficiency: float
-        Fraction of fuel value turned into propulsive force. Defaults to 0.1.
+        Fraction of fuel value turned into propulsive force. Defaults to 0.5.
     fuel_value: float
         Fuel value in J/kg. Defaults to 42.0e6.
 
@@ -78,4 +78,5 @@ def power_to_fuel_burning_rate(
         Fuel burning rate in kg/s.
 
     """
-    raise NotImplementedError
+    fuel_burning_rate = power / efficiency / fuel_value
+    return fuel_burning_rate
