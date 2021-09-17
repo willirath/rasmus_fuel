@@ -1,0 +1,14 @@
+name: rasmus_fuel
+channels:
+  - conda-forge
+dependencies:
+  - python=3.8
+  - numpy
+  - jupyter
+  - jupyterlab
+  - notebook
+  - ipykernel
+  - matplotlib
+  - pip
+  - pip:
+      - git+https://github.com/willirath/rasmus_fuel

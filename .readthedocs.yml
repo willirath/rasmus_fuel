@@ -1,0 +1,15 @@
+# Required
+version: 2
+
+# Build documentation in the doc/ directory with Sphinx
+sphinx:
+  configuration: doc/conf.py
+
+conda:
+    environment: environment_doc.yml
+
+python:
+  version: 3.8
+  install:
+    - method: pip
+      path: .
