@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from rasmus_fuel.simplest import power_maintain_sog
+from rasmus_fuel.simplest import power_maintain_sog, power_to_fuel_burning_rate
 
 
 def test_simplest_power_maintain_sog_no_movement():
@@ -22,7 +22,7 @@ def test_simplest_power_maintain_sog_no_drag():
             v_ship_og=v_ship_og,
             u_current=u_current,
             v_current=v_current,
-            drag_coeff=0,
+            coeff=0,
         ),
     )
 
@@ -52,3 +52,10 @@ def test_simplest_power_maintain_sog_kwargs_ignored():
         ),
         power_maintain_sog(u_ship_og=1, v_ship_og=1, u_current=0, v_current=0),
     )
+
+
+def test_power_to_fuel_burning_rate_just_call():
+    power_to_fuel_burning_rate(power=1.0, efficiency=0.5, fuel_value=42e6)
+
+
+# TODO: test with actual numbers for plausibility checks

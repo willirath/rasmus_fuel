@@ -7,7 +7,7 @@ def power_maintain_sog(
     v_ship_og: npt.ArrayLike = None,
     u_current: npt.ArrayLike = None,
     v_current: npt.ArrayLike = None,
-    drag_coeff: float = 1.0,
+    coeff: float = 1.0,
     **kwargs,
 ):
     """Calculate quadratic drag law power needed to maintain speed over ground.
@@ -25,16 +25,19 @@ def power_maintain_sog(
     v_current: array
         Ocean currents northward speed over ground in meters per second.
         Needs shape that can be broadcast to shape of u_ship_og and v_ship_og.
-    drag_coeff: float
-        Drag coefficient in arbitrary units.
+    coeff: float
+        Coefficient in units of kg/m. This coefficient contains info about
+        the density of water, the effective cross section of the vessel and the
+        drag coefficient of the vessel.  Defaults to 1.0
 
     All other keyword arguments will be ignored.
 
     Returns
     -------
     array:
-        Fuel consumption for each element of u_ship_og and v_ship_og.
-        Shape will be identical to u_ship_og and v_ship_og.
+        Power in W (=kg*m2/s3) needed to maintain speed over ground for each
+        element of u_ship_og and v_ship_og. Shape will be identical to
+        u_ship_og and v_ship_og.
 
     """
     # ensure shapes of u_ship_og and v_ship_og agree
@@ -47,9 +50,33 @@ def power_maintain_sog(
 
     # calc power to maintain speed over ground
     power_needed = (
-        drag_coeff
+        coeff
         * (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
         * (u_ship_tw * u_ship_og + v_ship_tw * v_ship_og)
     )
 
     return power_needed
+
+
+def power_to_fuel_burning_rate(
+    power: npt.ArrayLike = None, efficiency: float = 0.5, fuel_value: float = 42.0e6
+):
+    """Convert power to fuel buring rate.
+
+    Parameters
+    ----------
+    power: array
+        Power in W (=kg*m2/s3).
+    efficiency: float
+        Fraction of fuel value turned into propulsive force. Defaults to 0.5.
+    fuel_value: float
+        Fuel value in J/kg. Defaults to 42.0e6.
+
+    Returns
+    -------
+    array
+        Fuel burning rate in kg/s.
+
+    """
+    fuel_burning_rate = power / efficiency / fuel_value
+    return fuel_burning_rate
