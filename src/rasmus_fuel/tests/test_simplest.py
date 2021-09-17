@@ -56,3 +56,6 @@ def test_simplest_power_maintain_sog_kwargs_ignored():
 
 def test_power_to_fuel_burning_rate_just_call():
     power_to_fuel_burning_rate(power=1.0, efficiency=0.5, fuel_value=42e6)
+
+
+# TODO: test with actual numbers for plausibility checks
