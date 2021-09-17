@@ -1,3 +1,4 @@
+import numpy as np
 import numpy.typing as npt
 
 
@@ -34,16 +35,14 @@ def power_maintain_sog(
 
     """
     # ensure shapes of u_ship and v_ship agree
-    if u_ship.shape != v_ship.shape:
+    if np.array(u_ship).shape != np.array(v_ship).shape:
         raise ValueError('Shape of u_ship and v_ship need to agree.')
 
     # calc power to maintain speed over ground
     power_needed = (
         drag_coeff
         * ((u_ship - u_current) ** 2 + (v_ship - v_current) ** 2) ** 0.5
-        * (u_ship - u_current)
-        * u_ship
-        + (v_ship - v_current) * v_ship
+        * ((u_ship - u_current) * u_ship + (v_ship - v_current) * v_ship)
     )
 
     return power_needed
