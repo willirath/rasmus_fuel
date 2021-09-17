@@ -12,7 +12,7 @@ Required dependencies
 Optional dependencies
 ---------------------
 
-None. 
+None.
 
 Install from source
 -------------------
