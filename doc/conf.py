@@ -15,8 +15,9 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../src/rasmus_fuel/'))
 
-import rasmu_fuel  # noqa
 import sphinx_autosummary_accessors
+
+import rasmus_fuel  # noqa
 
 # -- Project information -----------------------------------------------------
 
