@@ -9,7 +9,7 @@ def power_maintain_sog(
     v_current: npt.ArrayLike = None,
     coeff: float = 1.0,
     **kwargs,
-):
+) -> npt.ArrayLike:
     """Calculate quadratic drag law power needed to maintain speed over ground.
 
     Parameters
@@ -49,18 +49,15 @@ def power_maintain_sog(
     v_ship_tw = v_ship_og - v_current
 
     # calc power to maintain speed over ground
-    power_needed = (
-        coeff
-        * (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
-        * (u_ship_tw * u_ship_og + v_ship_tw * v_ship_og)
-    )
+    speed_tw = (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
+    power_needed = coeff * (speed_tw ** 3)
 
     return power_needed
 
 
 def power_to_fuel_burning_rate(
     power: npt.ArrayLike = None, efficiency: float = 0.5, fuel_value: float = 42.0e6
-):
+) -> npt.ArrayLike:
     """Convert power to fuel buring rate.
 
     Parameters
