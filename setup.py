@@ -46,6 +46,10 @@ setup(
     },
     license='MIT',
     zip_safe=False,
-    use_scm_version={'version_scheme': 'post-release', 'local_scheme': 'dirty-tag'},
+    use_scm_version={
+        'version_scheme': 'post-release',
+        'local_scheme': 'dirty-tag',
+        'fallback_version': 'gitless-install',
+    },
     setup_requires=['setuptools_scm', 'setuptools>=30.3.0'],
 )
