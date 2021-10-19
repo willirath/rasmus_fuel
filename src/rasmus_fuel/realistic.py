@@ -9,33 +9,34 @@ VESSEL_PARAM = {
     #       area of the above water vessel structure exposed to wind [m ** 2]. Defaults to 345
     #   vessel_subsurface_area: float
     #       an average area of the lateral projection of underwater vessel structure [m ** 2]. Defaults to 245
-    #   water_drag_coefficient: float
+    #   vessel_water_drag_coefficient: float
     #       water drag coefficient for vessel [kg/m]. Defaults to 6000
-    #   waterline_width: float
+    #   vessel_waterline_width: float
     #       width of vessel at the waterline in [m]. Defaults to 30
-    #   waterline_length: float
+    #   vessel_waterline_length: float
     #       length of vessel at the waterline in [m]. Defaults to 210
-    #   total_propulsive_efficiency: float
+    #   vessel_total_propulsive_efficiency: float
     #       total propulsive engine efficiency. Defaults to 0.7
     #   vessel_draught: float
     #       vessel draught in [m]. Defaults to 11.5
-    #   specific_fuel_consumption: float
+    #   vessel_specific_fuel_consumption: float
     #       specific fuel consumption  [g/kWh]. Defaults to 180
-    #   DWT: float
+    #   vessel_DWT: float
     #       vessel dead weight in kg. Defaults to 33434
-    #   conversion_factor_fuelmass2CO2: float
+    #   vessel_conversion_factor_fuelmass2CO2: float
     #       conversion factor from fuel consumption to mass of CO2 emmitted (diesel/gas oil). Defaults to 3.2060
     # """
-    "waterline_width": 30.0,
-    "waterline_length": 210.0,
-    "total_propulsive_efficiency": 0.7,
+    "vessel_waterline_width": 30.0,
+    "vessel_waterline_length": 210.0,
+    "vessel_total_propulsive_efficiency": 0.7,
     "vessel_draught": 11.5,
     "vessel_supersurface_area": 345.0,
     "vessel_subsurface_area": 245.0,
-    "water_drag_coefficient": 6000.0,
-    "specific_fuel_consumption": 180.0,
-    "DWT": 33434.0,
-    "conversion_factor_fuelmass2CO2": 3.2060
+    "vessel_water_drag_coefficient": 6000.0,
+    "vessel_specific_fuel_consumption": 180.0,
+    "vessel_DWT": 33434.0,
+    "vessel_conversion_factor_fuelmass2CO2": 3.2060
+    "vessel_reference_froede_number": 0.12,
 }
 
 PHYSICS_PARAM = {
@@ -57,7 +58,6 @@ PHYSICS_PARAM = {
     #     """
     "air_mass_density": 1.225,
     "wind_resistance_coefficient": 0.4,
-    "reference_froede_number": 0.12,
     "spectral_average": 0.5,
     "surface_water_density": 1029.0,
     "acceleration_gravity": 9.80665,
@@ -75,18 +75,18 @@ def power_maintain_sog(
     w_wave_hight: npt.ArrayLike = None,
    # physics_param: dict = None,
    # vessel_param: dict = None,
-    waterline_width = 30.0,
-    waterline_length = 210.0,
-    total_propulsive_efficiency= 0.7,
+    vessel_waterline_width = 30.0,
+    vessel_waterline_length = 210.0,
+    vessel_total_propulsive_efficiency= 0.7,
     vessel_draught = 11.5,
     vessel_supersurface_area = 345.0,
     vessel_subsurface_area = 245.0,
-    water_drag_coefficient = 6000.0,
-    specific_fuel_consumption = 180.0,
-    DWT = 33434.0,
+    vessel_water_drag_coefficient = 6000.0,
+    vessel_specific_fuel_consumption = 180.0,
+    vessel_DWT = 33434.0,
     air_mass_density = 1.225,
     wind_resistance_coefficient = 0.4,
-    reference_froede_number = 0.12,
+    vessel_reference_froede_number = 0.12,
     spectral_average = 0.5,
     surface_water_density = 1029.0,
     acceleration_gravity = 9.80665,
@@ -150,7 +150,7 @@ def power_maintain_sog(
     coeff_water_drag = (
         0.5
         * surface_water_density
-        * water_drag_coefficient
+        * vessel_water_drag_coefficient
         * vessel_supersurface_area
     )
 
@@ -169,22 +169,22 @@ def power_maintain_sog(
     coeff_wind_drag = (
         0.5
         * air_mass_density
-        * wind_resistance_coefficient
+        * vessel_ wind_resistance_coefficient
         * vessel_supersurface_area
     )
 
     coeff_wave_drag = (
         20.0
-        * (waterline_width / waterline_length) ** (-1.2)
-        * (1 / waterline_length) ** 0.62
-        / total_propulsive_efficiency
-        / reference_froede_number
+        * (vessel_waterline_width / vessel_waterline_length) ** (-1.2)
+        * (1 / vessel_waterline_length) ** 0.62
+        / vessel_total_propulsive_efficiency
+        / vessel_reference_froede_number
         * spectral_average
         * surface_water_density
-        * waterline_width ** 2
+        * vessel_waterline_width ** 2
         * (
             acceleration_gravity
-            / waterline_length ** 3
+            / vessel_waterline_length ** 3
         )
         ** 0.05
         * vessel_draught ** 0.62
@@ -228,8 +228,8 @@ def power_to_fuel_consump(
     steaming_time: npt.ArrayLike = None,
     distance: npt.ArrayLike = None,
   #  vessel_param: dict = None,
-    specific_fuel_consumption = 180.0,
-    DWT = 33434.0, 
+    vessel_specific_fuel_consumption = 180.0,
+    vessel_DWT = 33434.0, 
 
 ) -> npt.ArrayLike:
     """Convert engine power to fuel consumed per vessel weight per distance and unit time.
@@ -249,14 +249,13 @@ def power_to_fuel_consump(
         Fuel consumption T/kg/m.
     """
 
-    # assign vessel parameters
-    if vessel_param is None:
-        vessel_param = VESSEL_PARAM    
+    # estimate fuel consumption
+     
     fuel_consump = (
-        specific_fuel_consumption
+        vessel_specific_fuel_consumption
         * engine_power
         * steaming_time
-        / DWT  
+        / vessel_DWT  
         / distance
     )
     return fuel_consump
@@ -265,7 +264,7 @@ def power_to_fuel_consump(
 def energy_efficiency_per_time_distance(
     fuel_consumption: npt.ArrayLike = None, 
    # vessel_param: dict = None,
-    conversion_factor_fuelmass2CO2 = 3.2060,
+    vessel_conversion_factor_fuelmass2CO2 = 3.2060,
 ) -> npt.ArrayLike:
     """Convert engine power to fuel consumed per vessel weight per distance and unit time.
     
@@ -284,7 +283,7 @@ def energy_efficiency_per_time_distance(
     #if vessel_param is None:
     #    vessel_param = VESSEL_PARAM
     energy_efficiency = (
-        conversion_factor_fuelmass2CO2 * fuel_consumption
+        vessel_conversion_factor_fuelmass2CO2 * fuel_consumption
     )
     return energy_efficiency
 
