@@ -85,7 +85,7 @@ def power_maintain_sog(
     vessel_specific_fuel_consumption = 180.0,
     vessel_DWT = 33434.0,
     air_mass_density = 1.225,
-    wind_resistance_coefficient = 0.4,
+    vessel_wind_resistance_coefficient = 0.4,
     vessel_reference_froede_number = 0.12,
     spectral_average = 0.5,
     surface_water_density = 1029.0,
@@ -169,7 +169,7 @@ def power_maintain_sog(
     coeff_wind_drag = (
         0.5
         * air_mass_density
-        * vessel_ wind_resistance_coefficient
+        * vessel_wind_resistance_coefficient
         * vessel_supersurface_area
     )
 
