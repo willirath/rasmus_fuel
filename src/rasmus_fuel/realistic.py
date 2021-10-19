@@ -35,7 +35,7 @@ VESSEL_PARAM = {
     "vessel_water_drag_coefficient": 6000.0,
     "vessel_specific_fuel_consumption": 180.0,
     "vessel_DWT": 33434.0,
-    "vessel_conversion_factor_fuelmass2CO2": 3.2060
+    "vessel_conversion_factor_fuelmass2CO2": 3.2060,
     "vessel_reference_froede_number": 0.12,
 }
 
