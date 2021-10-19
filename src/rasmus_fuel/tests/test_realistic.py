@@ -1,5 +1,5 @@
- import numpy as np
- import pytest
+import numpy as np
+import pytest
 
 from rasmus_fuel.realistic import power_maintain_sog, power_to_fuel_burning_rate, power_to_fuel_consump, energy_efficiency_per_time_distance
 
