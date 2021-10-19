@@ -1,7 +1,7 @@
-# import numpy as np
-# import pytest
+ import numpy as np
+ import pytest
 
-from rasmus_fuel.realistic import power_maintain_sog
+from rasmus_fuel.realistic import power_maintain_sog, power_to_fuel_burning_rate, power_to_fuel_consump, energy_efficiency_per_time_distance
 
 def test_realistic_power_maintain_sog_no_movement():
     """Check for no power if no movement is happening."""
