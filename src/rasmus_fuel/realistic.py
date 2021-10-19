@@ -35,6 +35,7 @@ VESSEL_PARAM = {
     "water_drag_coefficient": 6000.0,
     "specific_fuel_consumption": 180.0,
     "DWT": 33434.0,
+    "conversion_factor_fuelmass2CO2": 3.2060
 }
 
 PHYSICS_PARAM = {
@@ -72,8 +73,23 @@ def power_maintain_sog(
     u_wind: npt.ArrayLike = None,
     v_wind: npt.ArrayLike = None,
     w_wave_hight: npt.ArrayLike = None,
-    physics_param: dict = None,
-    vessel_param: dict = None,
+   # physics_param: dict = None,
+   # vessel_param: dict = None,
+    waterline_width = 30.0,
+    waterline_length = 210.0,
+    total_propulsive_efficiency= 0.7,
+    vessel_draught = 11.5,
+    vessel_supersurface_area = 345.0,
+    vessel_subsurface_area = 245.0,
+    water_drag_coefficient = 6000.0,
+    specific_fuel_consumption = 180.0,
+    DWT = 33434.0,
+    air_mass_density = 1.225,
+    wind_resistance_coefficient = 0.4,
+    reference_froede_number = 0.12,
+    spectral_average = 0.5,
+    surface_water_density = 1029.0,
+    acceleration_gravity = 9.80665,
     **kwargs,
 ) -> npt.ArrayLike:
     """Calculate quadratic drag law power needed to maintain speed over ground.
@@ -116,10 +132,10 @@ def power_maintain_sog(
     """
 
     #  assign physical and vessel parameters
-    if physics_param is None:
-        physics_param = PHYSICS_PARAM
-    if vessel_param is None:
-        vessel_param = VESSEL_PARAM
+    #if physics_param is None:
+    #    physics_param = PHYSICS_PARAM
+    #if vessel_param is None:
+    #    vessel_param = VESSEL_PARAM
     # ensure shapes of u_ship_og and v_ship_og agree
     if np.array(u_ship_og).shape != np.array(v_ship_og).shape:
         raise ValueError("Shape of u_ship_og and v_ship_og need to agree.")
@@ -133,9 +149,9 @@ def power_maintain_sog(
 
     coeff_water_drag = (
         0.5
-        * physics_param["surface_water_density"]
-        * vessel_param["water_drag_coefficient"]
-        * vessel_param["vessel_supersurface_area"]
+        * surface_water_density
+        * water_drag_coefficient
+        * vessel_supersurface_area
     )
 
     power_needed = coeff_water_drag * (speed_tw ** 3)
@@ -152,26 +168,26 @@ def power_maintain_sog(
 
     coeff_wind_drag = (
         0.5
-        * physics_param["air_mass_density"]
-        * physics_param["wind_resistance_coefficient"]
-        * vessel_param["vessel_supersurface_area"]
+        * air_mass_density
+        * wind_resistance_coefficient
+        * vessel_supersurface_area
     )
 
     coeff_wave_drag = (
         20.0
-        * (vessel_param["waterline_width"] / vessel_param["waterline_length"]) ** (-1.2)
-        * (1 / vessel_param["waterline_length"]) ** 0.62
-        / vessel_param["total_propulsive_efficiency"]
-        / physics_param["reference_froede_number"]
-        * physics_param["spectral_average"]
-        * physics_param["surface_water_density"]
-        * vessel_param["waterline_width"] ** 2
+        * (waterline_width / waterline_length) ** (-1.2)
+        * (1 / waterline_length) ** 0.62
+        / total_propulsive_efficiency
+        / reference_froede_number
+        * spectral_average
+        * surface_water_density
+        * waterline_width ** 2
         * (
-            physics_param["acceleration_gravity"]
-            / vessel_param["waterline_length"] ** 3
+            acceleration_gravity
+            / waterline_length ** 3
         )
         ** 0.05
-        * vessel_param["vessel_draught"] ** 0.62
+        * vessel_draught ** 0.62
         * 0.25
     )
 
@@ -211,7 +227,10 @@ def power_to_fuel_consump(
     engine_power: npt.ArrayLike = None,
     steaming_time: npt.ArrayLike = None,
     distance: npt.ArrayLike = None,
-    vessel_param: dict = None,
+  #  vessel_param: dict = None,
+    specific_fuel_consumption = 180.0,
+    DWT = 33434.0, 
+
 ) -> npt.ArrayLike:
     """Convert engine power to fuel consumed per vessel weight per distance and unit time.
     
@@ -227,24 +246,26 @@ def power_to_fuel_consump(
     Returns
     -------
     array
-        Fuel consumption kW/kg/m.
+        Fuel consumption T/kg/m.
     """
 
     # assign vessel parameters
     if vessel_param is None:
-        vessel_param = VESSEL_PARAM
+        vessel_param = VESSEL_PARAM    
     fuel_consump = (
-        vessel_param["specific_fuel_consumption"]
+        specific_fuel_consumption
         * engine_power
         * steaming_time
-        / vessel_param["DWT"]
+        / DWT  
         / distance
     )
     return fuel_consump
 
 
 def energy_efficiency_per_time_distance(
-    fuel_consumption: npt.ArrayLike = None, vessel_param: dict = None
+    fuel_consumption: npt.ArrayLike = None, 
+   # vessel_param: dict = None,
+    conversion_factor_fuelmass2CO2 = 3.2060,
 ) -> npt.ArrayLike:
     """Convert engine power to fuel consumed per vessel weight per distance and unit time.
     
@@ -260,10 +281,10 @@ def energy_efficiency_per_time_distance(
     """
 
     # assign vessel parameters
-    if vessel_param is None:
-        vessel_param = VESSEL_PARAM
+    #if vessel_param is None:
+    #    vessel_param = VESSEL_PARAM
     energy_efficiency = (
-        vessel_param["conversion_factor_fuelmass2CO2"] * fuel_consumption
+        conversion_factor_fuelmass2CO2 * fuel_consumption
     )
     return energy_efficiency
 
