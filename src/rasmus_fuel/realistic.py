@@ -106,7 +106,7 @@ def power_maintain_sog(
     # calc engine power to maintain speed over ground using : (1) ocean current resistance, (2) wind resistance, (3) wave resistance
 
     # calc relative wind speed
-    speed_rel_to_wind = ((u_ship_og - u_wind) ** 2 + (v_ship_og - v_wind) ** 2) ** 0.5
+    speed_rel_to_wind = ((u_ship_og - u_wind) ** 2 + (v_ship_og - u_wind) ** 2) ** 0.5
 
     coeff_wind_drag = (
         0.5
