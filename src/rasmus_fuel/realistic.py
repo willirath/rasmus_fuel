@@ -43,31 +43,28 @@ PHYSICS_PARAM = {
     # """Define physical model parameters
     #     Parameters
     # --------------
-    #     air_mass_density: float
+    #     physics_air_mass_density: float
     #        mass density of air [kg/m**3]. Defaults to 1.225
-    #     wind_resistance_coefficient: float
+    #     physics_wind_resistance_coefficient: float
     #        wind resistance coefficent, typically in rages [0.4-1]. Defaults to 0.4
-    #     reference_froede_number: float
-    #        Froede number, dimensionless. Defaults to 0.12
-    #     spectral_average: float
+    #     physics_spectral_average: float
     #        spectral and angular dependency factor, dimensionless. Defaults to 0.5
-    #     surface_water_density: float
+    #     physics_surface_water_density: float
     #        density of surface water [kg/m**3]. Defaults to 1029
-    #     acceleration_gravity: float
+    #     physics_acceleration_gravity: float
     #        the Earth gravity accleration [m/s**2]. Defaults to 9.80665
     #     """
-    "air_mass_density": 1.225,
-    "wind_resistance_coefficient": 0.4,
-    "spectral_average": 0.5,
-    "surface_water_density": 1029.0,
-    "acceleration_gravity": 9.80665,
+    "physics_air_mass_density": 1.225,
+    "physics_wind_resistance_coefficient": 0.4,
+    "physics_spectral_average": 0.5,
+    "physics_surface_water_density": 1029.0,
+    "physics_acceleration_gravity": 9.80665,
 }
 
 
 def power_maintain_sog(
     u_ship_og: npt.ArrayLike = None,
     v_ship_og: npt.ArrayLike = None,
-    course_ship_og: npt.ArrayLike = None,
     u_current: npt.ArrayLike = None,
     v_current: npt.ArrayLike = None,
     u_wind: npt.ArrayLike = None,
@@ -84,12 +81,12 @@ def power_maintain_sog(
     vessel_water_drag_coefficient = 6000.0,
     vessel_specific_fuel_consumption = 180.0,
     vessel_DWT = 33434.0,
-    air_mass_density = 1.225,
+    physics_air_mass_density = 1.225,
     vessel_wind_resistance_coefficient = 0.4,
     vessel_reference_froede_number = 0.12,
-    spectral_average = 0.5,
-    surface_water_density = 1029.0,
-    acceleration_gravity = 9.80665,
+    physics_spectral_average = 0.5,
+    physics_surface_water_density = 1029.0,
+    physics_acceleration_gravity = 9.80665,
     **kwargs,
 ) -> npt.ArrayLike:
     """Calculate quadratic drag law power needed to maintain speed over ground.
@@ -102,9 +99,6 @@ def power_maintain_sog(
     v_ship_og: array
         Ship northward speed over ground in meters per second.
         Needs same shape as u_ship_og.
-    course_ship_og: array
-        Ship course over ground in radians
-        needs same shape as u_ship_og
     u_current: array
         Ocean currents eastward speed over ground in meters per second.
         Needs shape that can be broadcast to shape of u_ship_og and v_ship_og.
@@ -146,10 +140,11 @@ def power_maintain_sog(
 
     # calc engine power to maintain speed over ground using ocean current resistance term
     speed_tw = (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
+    course_ship_og = np.arctan2(v_ship_tw, u_ship_tw)
 
     coeff_water_drag = (
         0.5
-        * surface_water_density
+        * physics_surface_water_density
         * vessel_water_drag_coefficient
         * vessel_supersurface_area
     )
@@ -168,7 +163,7 @@ def power_maintain_sog(
 
     coeff_wind_drag = (
         0.5
-        * air_mass_density
+        * physics_air_mass_density
         * vessel_wind_resistance_coefficient
         * vessel_supersurface_area
     )
@@ -179,11 +174,11 @@ def power_maintain_sog(
         * (1 / vessel_waterline_length) ** 0.62
         / vessel_total_propulsive_efficiency
         / vessel_reference_froede_number
-        * spectral_average
-        * surface_water_density
+        * physics_spectral_average
+        * physics_surface_water_density
         * vessel_waterline_width ** 2
         * (
-            acceleration_gravity
+            physics_acceleration_gravity
             / vessel_waterline_length ** 3
         )
         ** 0.05
@@ -249,15 +244,14 @@ def power_to_fuel_consump(
         Fuel consumption T/kg/m.
     """
 
-    # estimate fuel consumption
-     
     fuel_consump = (
         vessel_specific_fuel_consumption
         * engine_power
         * steaming_time
         / vessel_DWT  
         / distance
-    )
+       )
+    
     return fuel_consump
 
 
