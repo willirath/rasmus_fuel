@@ -25,7 +25,7 @@ def power_maintain_sog(
     **kwargs,
 ) -> npt.ArrayLike:
     """Calculate quadratic drag law power needed to maintain speed over ground.
-    
+
     Parameters
     ----------
     u_ship_og: array
@@ -72,9 +72,9 @@ def power_maintain_sog(
        density of surface water [kg/m**3]. Defaults to 1029
     physics_acceleration_gravity: float
        the Earth gravity accleration [m/s**2]. Defaults to 9.80665
-        
+
     All other keyword arguments will be ignored.
-    
+
     Returns
     -------
     array:
@@ -85,7 +85,7 @@ def power_maintain_sog(
 
     # ensure shapes of u_ship_og and v_ship_og agree
     if np.array(u_ship_og).shape != np.array(v_ship_og).shape:
-        raise ValueError("Shape of u_ship_og and v_ship_og need to agree.")
+        raise ValueError('Shape of u_ship_og and v_ship_og need to agree.')
 
     # calc speed through water
     u_ship_tw = u_ship_og - u_current
@@ -143,7 +143,7 @@ def power_to_fuel_burning_rate(
     power: npt.ArrayLike = None, efficiency: float = 0.5, fuel_value: float = 42.0e6
 ) -> npt.ArrayLike:
     """Convert power to fuel buring rate.
-    
+
     Parameters
     ----------
     power: array
@@ -152,7 +152,7 @@ def power_to_fuel_burning_rate(
         Fraction of fuel value turned into propulsive force. Defaults to 0.5.
     fuel_value: float
         Fuel value in J/kg. Defaults to 42.0e6.
-        
+
     Returns
     -------
     array
@@ -170,32 +170,28 @@ def power_to_fuel_consump(
     vessel_DWT=33434.0,
 ) -> npt.ArrayLike:
     """Convert engine power to fuel consumed per vessel weight per distance and unit time.
-    
-   Parameters
-    ----------
-    engine_power: array
-        engine power in kWh .
-    steaming_time: array
-        sailing time [hours] for vessel
-    distance: array
-        sailing distance in m
-    vessel_specific_fuel_consumption: float
-        specific fuel consumption  [g/kWh]. Defaults to 180
-    vessel_DWT: float
-        vessel dead weight in kg. Defaults to 33434
 
-    Returns
-    -------
-    array
-        Fuel consumption T/kg/m.
+    Parameters
+     ----------
+     engine_power: array
+         engine power in kWh .
+     steaming_time: array
+         sailing time [hours] for vessel
+     distance: array
+         sailing distance in m
+     vessel_specific_fuel_consumption: float
+         specific fuel consumption  [g/kWh]. Defaults to 180
+     vessel_DWT: float
+         vessel dead weight in kg. Defaults to 33434
+
+     Returns
+     -------
+     array
+         Fuel consumption T/kg/m.
     """
 
     fuel_consump = (
-        vessel_specific_fuel_consumption
-        * engine_power
-        * steaming_time
-        / vessel_DWT
-        / distance
+        vessel_specific_fuel_consumption * engine_power * steaming_time / vessel_DWT / distance
     )
 
     return fuel_consump
@@ -206,14 +202,14 @@ def energy_efficiency_per_time_distance(
     vessel_conversion_factor_fuelmass2CO2=3.2060,
 ) -> npt.ArrayLike:
     """Convert engine power to fuel consumed per vessel weight per distance and unit time.
-    
+
     Parameters
     ----------
     fuel_consumption: array
         fuel consumption kWh/kg/m
     vessel_conversion_factor_fuelmass2CO2: float
         conversion factor from fuel consumption to mass of CO2 emmitted (diesel/gas oil). Defaults to 3.2060
-    
+
     Returns
     -------
     array
@@ -222,4 +218,3 @@ def energy_efficiency_per_time_distance(
 
     energy_efficiency = vessel_conversion_factor_fuelmass2CO2 * fuel_consumption
     return energy_efficiency
-
