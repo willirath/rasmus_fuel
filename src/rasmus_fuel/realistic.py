@@ -93,7 +93,6 @@ def power_maintain_sog(
 
     # calc engine power to maintain speed over ground using ocean current resistance term
     speed_tw = (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
-    course_ship_og = np.arctan2(v_ship_tw, u_ship_tw)
 
     coeff_water_drag = (
         0.5
@@ -107,12 +106,7 @@ def power_maintain_sog(
     # calc engine power to maintain speed over ground using : (1) ocean current resistance, (2) wind resistance, (3) wave resistance
 
     # calc relative wind speed
-    wind_speed = (u_wind ** 2 + v_wind ** 2) ** 0.5
-    wind_dir = np.arctan2(v_wind, u_wind)
-    wind_dir_rel = wind_dir - course_ship_og + np.pi
-
-    u_wind_rel = wind_speed * np.cos(wind_dir_rel) - u_ship_og
-    v_wind_rel = wind_speed * np.sin(wind_dir_rel) - v_ship_og
+    speed_rel_to_wind = ((u_ship_og - u_wind) ** 2 + (v_ship_og - v_wind) ** 2) ** 0.5
 
     coeff_wind_drag = (
         0.5
@@ -138,7 +132,7 @@ def power_maintain_sog(
     # TODO: Check if the referecnce systems used here are correct.
     power_needed = (
         coeff_water_drag * (speed_tw ** 3)
-        + coeff_wind_drag * (u_wind_rel ** 2 + v_wind_rel ** 2) * speed_tw
+        + coeff_wind_drag * speed_rel_to_wind ** 2 * speed_tw
         + coeff_wave_drag * w_wave_hight ** 2 * speed_tw
     )
 
