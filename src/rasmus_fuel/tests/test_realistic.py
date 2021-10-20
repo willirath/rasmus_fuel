@@ -37,6 +37,9 @@ def test_realistic_power_maintain_sog_no_drag():
             u_wind=u_wind,
             v_wind=v_wind,
             w_wave_hight=w_wave_hight,
+            vessel_water_drag_coefficient =0,
+            vessel_wind_resistance_coefficient =0,
+            vessel_draught =0,
         ),
     )
 
@@ -44,9 +47,9 @@ def test_realistic_power_maintain_sog_no_drag():
 def test_power_maintain_sog_isotropic():
     """Ensure unchanged results if swapping directions."""
     np.testing.assert_allclose(
-        power_maintain_sog(u_ship_og=1, u_current=5, v_ship_og=0, v_current=0, course_ship_og=course_ship_og,
+        power_maintain_sog(u_ship_og=1, u_current=5, v_ship_og=0, v_current=0, course_ship_og= 90.0,
             u_wind=1,v_wind=2, w_wave_hight=0),
-        power_maintain_sog(u_ship_og=0, u_current=0, v_ship_og=1, v_current=5, course_ship_og=course_ship_og,
+        power_maintain_sog(u_ship_og=0, u_current=0, v_ship_og=1, v_current=5, course_ship_og= 0.0,
             u_wind=1,v_wind=2, w_wave_hight=0),
     )
 
@@ -82,7 +85,7 @@ def test_power_to_fuel_consump_zero():
 
 def test_power_to_fuel_consump_correct_value():
     """ Test if fuel consumption returns correct value"""
-    assert 2.0 * 180.0/33434.0 == power_to_fuel_consump(engine_power=1.0, steaming_time=0.5, distance=1.0)    
+    assert 180.0* 0.5 /33434.0 == power_to_fuel_consump(engine_power=1.0, steaming_time=0.5, distance=1.0)  
 
 def test_power_to_fuel_burning_rate_just_call():
     power_to_fuel_burning_rate(power=1.0, efficiency=0.5, fuel_value=42e6)
