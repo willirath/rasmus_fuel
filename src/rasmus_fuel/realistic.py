@@ -1,66 +1,6 @@
 import numpy as np
 import numpy.typing as npt
 
-VESSEL_PARAM = {
-    # """Define vessel parameters
-    #   Parameters
-    # --------------
-    #   vessel_supersurface_area: float
-    #       area of the above water vessel structure exposed to wind [m ** 2]. Defaults to 345
-    #   vessel_subsurface_area: float
-    #       an average area of the lateral projection of underwater vessel structure [m ** 2]. Defaults to 245
-    #   vessel_water_drag_coefficient: float
-    #       water drag coefficient for vessel [kg/m]. Defaults to 6000
-    #   vessel_waterline_width: float
-    #       width of vessel at the waterline in [m]. Defaults to 30
-    #   vessel_waterline_length: float
-    #       length of vessel at the waterline in [m]. Defaults to 210
-    #   vessel_total_propulsive_efficiency: float
-    #       total propulsive engine efficiency. Defaults to 0.7
-    #   vessel_draught: float
-    #       vessel draught in [m]. Defaults to 11.5
-    #   vessel_specific_fuel_consumption: float
-    #       specific fuel consumption  [g/kWh]. Defaults to 180
-    #   vessel_DWT: float
-    #       vessel dead weight in kg. Defaults to 33434
-    #   vessel_conversion_factor_fuelmass2CO2: float
-    #       conversion factor from fuel consumption to mass of CO2 emmitted (diesel/gas oil). Defaults to 3.2060
-    # """
-    "vessel_waterline_width": 30.0,
-    "vessel_waterline_length": 210.0,
-    "vessel_total_propulsive_efficiency": 0.7,
-    "vessel_draught": 11.5,
-    "vessel_supersurface_area": 345.0,
-    "vessel_subsurface_area": 245.0,
-    "vessel_water_drag_coefficient": 6000.0,
-    "vessel_specific_fuel_consumption": 180.0,
-    "vessel_DWT": 33434.0,
-    "vessel_conversion_factor_fuelmass2CO2": 3.2060,
-    "vessel_reference_froede_number": 0.12,
-}
-
-PHYSICS_PARAM = {
-    # """Define physical model parameters
-    #     Parameters
-    # --------------
-    #     physics_air_mass_density: float
-    #        mass density of air [kg/m**3]. Defaults to 1.225
-    #     physics_wind_resistance_coefficient: float
-    #        wind resistance coefficent, typically in rages [0.4-1]. Defaults to 0.4
-    #     physics_spectral_average: float
-    #        spectral and angular dependency factor, dimensionless. Defaults to 0.5
-    #     physics_surface_water_density: float
-    #        density of surface water [kg/m**3]. Defaults to 1029
-    #     physics_acceleration_gravity: float
-    #        the Earth gravity accleration [m/s**2]. Defaults to 9.80665
-    #     """
-    "physics_air_mass_density": 1.225,
-    "physics_wind_resistance_coefficient": 0.4,
-    "physics_spectral_average": 0.5,
-    "physics_surface_water_density": 1029.0,
-    "physics_acceleration_gravity": 9.80665,
-}
-
 
 def power_maintain_sog(
     u_ship_og: npt.ArrayLike = None,
@@ -70,23 +10,23 @@ def power_maintain_sog(
     u_wind: npt.ArrayLike = None,
     v_wind: npt.ArrayLike = None,
     w_wave_hight: npt.ArrayLike = None,
-   # physics_param: dict = None,
-   # vessel_param: dict = None,
-    vessel_waterline_width = 30.0,
-    vessel_waterline_length = 210.0,
-    vessel_total_propulsive_efficiency= 0.7,
-    vessel_draught = 11.5,
-    vessel_supersurface_area = 345.0,
-    vessel_subsurface_area = 245.0,
-    vessel_water_drag_coefficient = 6000.0,
-    vessel_specific_fuel_consumption = 180.0,
-    vessel_DWT = 33434.0,
-    physics_air_mass_density = 1.225,
-    vessel_wind_resistance_coefficient = 0.4,
-    vessel_reference_froede_number = 0.12,
-    physics_spectral_average = 0.5,
-    physics_surface_water_density = 1029.0,
-    physics_acceleration_gravity = 9.80665,
+    # physics_param: dict = None,
+    # vessel_param: dict = None,
+    vessel_waterline_width=30.0,
+    vessel_waterline_length=210.0,
+    vessel_total_propulsive_efficiency=0.7,
+    vessel_draught=11.5,
+    vessel_supersurface_area=345.0,
+    vessel_subsurface_area=245.0,
+    vessel_water_drag_coefficient=6000.0,
+    vessel_specific_fuel_consumption=180.0,
+    vessel_DWT=33434.0,
+    physics_air_mass_density=1.225,
+    vessel_wind_resistance_coefficient=0.4,
+    vessel_reference_froede_number=0.12,
+    physics_spectral_average=0.5,
+    physics_surface_water_density=1029.0,
+    physics_acceleration_gravity=9.80665,
     **kwargs,
 ) -> npt.ArrayLike:
     """Calculate quadratic drag law power needed to maintain speed over ground.
@@ -126,9 +66,9 @@ def power_maintain_sog(
     """
 
     #  assign physical and vessel parameters
-    #if physics_param is None:
+    # if physics_param is None:
     #    physics_param = PHYSICS_PARAM
-    #if vessel_param is None:
+    # if vessel_param is None:
     #    vessel_param = VESSEL_PARAM
     # ensure shapes of u_ship_og and v_ship_og agree
     if np.array(u_ship_og).shape != np.array(v_ship_og).shape:
@@ -177,15 +117,12 @@ def power_maintain_sog(
         * physics_spectral_average
         * physics_surface_water_density
         * vessel_waterline_width ** 2
-        * (
-            physics_acceleration_gravity
-            / vessel_waterline_length ** 3
-        )
-        ** 0.05
+        * (physics_acceleration_gravity / vessel_waterline_length ** 3) ** 0.05
         * vessel_draught ** 0.62
         * 0.25
     )
 
+    # TODO: Check if the referecnce systems used here are correct.
     power_needed = (
         coeff_water_drag * (speed_tw ** 3)
         + coeff_wind_drag * (u_wind_rel ** 2 + v_wind_rel ** 2) * speed_tw
@@ -222,10 +159,9 @@ def power_to_fuel_consump(
     engine_power: npt.ArrayLike = None,
     steaming_time: npt.ArrayLike = None,
     distance: npt.ArrayLike = None,
-  #  vessel_param: dict = None,
-    vessel_specific_fuel_consumption = 180.0,
-    vessel_DWT = 33434.0, 
-
+    #  vessel_param: dict = None,
+    vessel_specific_fuel_consumption=180.0,
+    vessel_DWT=33434.0,
 ) -> npt.ArrayLike:
     """Convert engine power to fuel consumed per vessel weight per distance and unit time.
     
@@ -248,17 +184,17 @@ def power_to_fuel_consump(
         vessel_specific_fuel_consumption
         * engine_power
         * steaming_time
-        / vessel_DWT  
+        / vessel_DWT
         / distance
-       )
-    
+    )
+
     return fuel_consump
 
 
 def energy_efficiency_per_time_distance(
-    fuel_consumption: npt.ArrayLike = None, 
-   # vessel_param: dict = None,
-    vessel_conversion_factor_fuelmass2CO2 = 3.2060,
+    fuel_consumption: npt.ArrayLike = None,
+    # vessel_param: dict = None,
+    vessel_conversion_factor_fuelmass2CO2=3.2060,
 ) -> npt.ArrayLike:
     """Convert engine power to fuel consumed per vessel weight per distance and unit time.
     
@@ -274,10 +210,8 @@ def energy_efficiency_per_time_distance(
     """
 
     # assign vessel parameters
-    #if vessel_param is None:
+    # if vessel_param is None:
     #    vessel_param = VESSEL_PARAM
-    energy_efficiency = (
-        vessel_conversion_factor_fuelmass2CO2 * fuel_consumption
-    )
+    energy_efficiency = vessel_conversion_factor_fuelmass2CO2 * fuel_consumption
     return energy_efficiency
 
