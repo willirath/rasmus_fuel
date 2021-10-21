@@ -92,7 +92,7 @@ def power_maintain_sog(
     v_ship_tw = v_ship_og - v_current
     
     # calc speed over ground    
-    speed_og = (u_speed_og ** 2 + v_speed_og ** 2) ** 0.5
+    speed_og = (u_ship_og ** 2 + v_ship_og ** 2) ** 0.5
 
     # calc engine power to maintain speed over ground using ocean current resistance term
     speed_tw = (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
