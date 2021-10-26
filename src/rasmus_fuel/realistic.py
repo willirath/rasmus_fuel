@@ -9,7 +9,7 @@ def power_maintain_sog(
     v_current: npt.ArrayLike = None,
     u_wind: npt.ArrayLike = None,
     v_wind: npt.ArrayLike = None,
-    w_wave_hight: npt.ArrayLike = None,
+    w_wave_height: npt.ArrayLike = None,
     vessel_waterline_width=30.0,
     vessel_waterline_length=210.0,
     vessel_total_propulsive_efficiency=0.7,
@@ -45,7 +45,7 @@ def power_maintain_sog(
     v_wind: array
         Northward 10 m wind in m/s
         Needs shape that can be broadcst to shape of u_ship_og and v_ship_og
-    w_wave_hight: array
+    w_wave_height: array
         Spectral significant wave height (Hm0), meters
         Needs shape that can be broadcst to shape of u_ship_og and v_ship_og
     vessel_supersurface_area: float
@@ -101,7 +101,7 @@ def power_maintain_sog(
         0.5
         * physics_surface_water_density
         * vessel_water_drag_coefficient
-        * vessel_supersurface_area
+        * vessel_subsurface_area
     )
 
     power_needed = coeff_water_drag * (speed_tw ** 3)
@@ -136,7 +136,7 @@ def power_maintain_sog(
     power_needed = (
         coeff_water_drag * (speed_tw ** 2) * speed_og
         + coeff_wind_drag * speed_rel_to_wind ** 2 * speed_og
-        + coeff_wave_drag * w_wave_hight ** 2 * speed_og
+        + coeff_wave_drag * w_wave_height ** 2 * speed_og
     )
 
     return power_needed
@@ -147,13 +147,14 @@ def power_maintain_sog(
     v_current: npt.ArrayLike = None,
     u_wind: npt.ArrayLike = None,
     v_wind: npt.ArrayLike = None,
-    w_wave_hight: npt.ArrayLike = None,
+    w_wave_height: npt.ArrayLike = None,
     engine_power: npt.ArrayLike = None,
     vessel_waterline_width=30.0,
     vessel_waterline_length=210.0,
     vessel_total_propulsive_efficiency=0.7,
     vessel_draught=11.5,
     vessel_supersurface_area=345.0,
+    vessel_subsurface_area=245.0,
     vessel_water_drag_coefficient=6000.0,
     physics_air_mass_density=1.225,
     vessel_wind_resistance_coefficient=0.4,
@@ -183,7 +184,7 @@ def power_maintain_sog(
     v_wind: array
         Northward 10 m wind in m/s
         Needs shape that can be broadcst to shape of course_ship_og
-    w_wave_hight: array
+    w_wave_height: array
         Spectral significant wave height (Hm0), meters
         Needs shape that can be broadcst to shape of course_ship_og
     engine_power: array
@@ -268,7 +269,7 @@ def power_maintain_sog(
     coeff2 = (- 2 * coeff_water_drag * (u_current * np.cos(course_ship_og + np.pi/2) + v_current * np.sin(course_ship_og + np.pi/2)) 
                   - 2 * coeff_wind_drag * (u_wind * np.cos(course_ship_og + np.pi/2) + v_wind * np.sin(course_ship_og + np.pi/2)))
     coeff1 =  (coeff_water_drag * (u_current ** 2  + v_current ** 2) + 
-                   coeff_wind_drag * (u_wind ** 2  + v_wind ** 2) + coeff_wave_drag * w_wave_hight ** 2)  
+                   coeff_wind_drag * (u_wind ** 2  + v_wind ** 2) + coeff_wave_drag * w_wave_height ** 2)  
     coeff0 = - engine_power
  
     # Make variable transformation to reduced cubic equation and solve using Cardano's formula
