@@ -1,6 +1,111 @@
 import numpy as np
 import numpy.typing as npt
 
+def froede_number_at_sog(
+    u_ship_og: npt.ArrayLike = None,
+    v_ship_og: npt.ArrayLike = None,
+    u_current: npt.ArrayLike = None,
+    v_current: npt.ArrayLike = None,
+    vessel_waterline_length=210.0,
+    physics_acceleration_gravity=9.80665,
+    **kwargs,
+) ->npt.ArrayLike:
+     """Calculate vessel Froede number from known speed over ground.
+
+    Parameters
+    ----------
+    u_ship_og: array
+        Ship eastward speed over ground in meters per second.
+    v_ship_og: array
+        Ship northward speed over ground in meters per second.
+        Needs same shape as u_ship_og.
+    u_current: array
+        Ocean currents eastward speed over ground in meters per second.
+        Needs shape that can be broadcast to shape of u_ship_og and v_ship_og.
+    v_current: array
+        Ocean currents northward speed over ground in meters per second.
+        Needs shape that can be broadcast to shape of u_ship_og and v_ship_og.    
+    vessel_waterline_length: float
+        length of vessel at the waterline in [m]. Defaults to 210
+    physics_acceleration_gravity: float
+       the Earth gravity accleration [m/s**2]. Defaults to 9.80665
+
+    All other keyword arguments will be ignored.
+
+    Returns
+    -------
+    array:
+        Froede number in [(m/s) ** (0.5)). Shape will be identical to
+        u_ship_og and v_ship_og.
+    """
+   
+    # ensure shapes of u_ship_og and v_ship_og agree
+    if np.array(u_ship_og).shape != np.array(v_ship_og).shape:
+        raise ValueError('Shape of u_ship_og and v_ship_og need to agree.')
+
+    # calc speed through water
+    u_ship_tw = u_ship_og - u_current
+    v_ship_tw = v_ship_og - v_current
+    
+
+    # calc engine power to maintain speed over ground using ocean current resistance term
+    speed_tw = (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
+    froede_number = speed_tw/np.sqrt(physics_acceleration_gravity * vessel_waterline_length)
+    return froede_number
+
+def vessel_water_drag(
+    u_ship_og: npt.ArrayLike = None,
+    v_ship_og: npt.ArrayLike = None,
+    vessel_total_propulsive_efficiency=0.7,
+    vessel_subsurface_area=245.0,
+    vessel_maximum_engine_power=14296344.0,
+    vessel_speed_calm_water=9.2592,
+    physics_surface_water_density=1029.0,
+) ->npt.ArrayLike:
+    """Calculate quadratic drag law power needed to maintain speed over ground.
+
+    Parameters
+    ----------
+    u_ship_og: array
+        Ship eastward speed over ground in meters per second.
+    v_ship_og: array
+        Ship northward speed over ground in meters per second.
+        Needs same shape as u_ship_og.
+    vessel_subsurface_area: float
+        an average area of the lateral projection of underwater vessel structure [m ** 2]. Defaults to 245
+    vessel_total_propulsive_efficiency: float
+        total propulsive engine efficiency. Defaults to 0.7
+    vessel_maximum_engine_power: float
+        vessel maximu engine power in [W]. Defaults to 14296344.0,
+    vessel_speed_calm_water: float
+        vessel speed maximum in calm water [m/s]. Defaults 9.259    
+    physics_surface_water_density: float
+       density of surface water [kg/m**3]. Defaults to 1029
+
+    All other keyword arguments will be ignored.
+
+    Returns
+    -------
+    array:
+        vessel water drag. Shape will be identical to
+        u_ship_og and v_ship_og unless q = 0. For q=0 the water drag is a float number value
+    """
+
+    # ensure shapes of u_ship_og and v_ship_og agree
+    if np.array(u_ship_og).shape != np.array(v_ship_og).shape:
+        raise ValueError('Shape of u_ship_og and v_ship_og need to agree.')
+    
+    # calc speed over ground    
+    speed_og = (u_ship_og ** 2 + v_ship_og ** 2) ** 0.5
+    
+    # Polynomial power coefficient
+    q = 0.0 
+    
+    water_drag = (2 * vessel_total_propulsive_efficiency * vessel_maximum_engine_power / vessel_speed_calm_water ** 3 
+                  / physics_surface_water_density / vessel_subsurface_area *
+                  (speed_og/vessel_speed_calm_water) ** q )
+    
+    return water_drag
 
 def power_maintain_sog(
     u_ship_og: npt.ArrayLike = None,
