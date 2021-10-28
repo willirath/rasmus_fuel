@@ -2,8 +2,8 @@ import numpy as np
 import numpy.typing as npt
 
 def froede_number_at_sog(
-    u_ship_og: npt.ArrayLike = None,
-    v_ship_og: npt.ArrayLike = None,
+    speed_ship_og: npt.ArrayLike = None,
+    course_ship_og: npt.ArrayLike = None,
     u_current: npt.ArrayLike = None,
     v_current: npt.ArrayLike = None,
     vessel_waterline_length=210.0,
@@ -14,11 +14,10 @@ def froede_number_at_sog(
 
     Parameters
     ----------
-    u_ship_og: array
-        Ship eastward speed over ground in meters per second.
-    v_ship_og: array
-        Ship northward speed over ground in meters per second.
-        Needs same shape as u_ship_og.
+    speed_ship_og: array
+        Ship speed over ground in meters per second.
+    course_ship_og: array
+        Course ship over ground in rad (0 for North, pi/2 for East direction)    
     u_current: array
         Ocean currents eastward speed over ground in meters per second.
         Needs shape that can be broadcast to shape of u_ship_og and v_ship_og.
@@ -43,8 +42,8 @@ def froede_number_at_sog(
         raise ValueError('Shape of u_ship_og and v_ship_og need to agree.')
 
     # calc speed through water
-    u_ship_tw = u_ship_og - u_current
-    v_ship_tw = v_ship_og - v_current
+    u_ship_tw = speed_ship_og * np.cos(course_ship_og + np.pi/2) - u_current
+    v_ship_tw = speed_ship_og * np.sin(course_ship_og + np.pi/2)  - v_current
     
 
     # calc engine power to maintain speed over ground using ocean current resistance term
@@ -105,22 +104,6 @@ def vessel_water_drag(
     water_drag = (2 * vessel_total_propulsive_efficiency * vessel_maximum_engine_power / vessel_speed_calm_water ** 3 
                   / physics_surface_water_density / vessel_subsurface_area * 
                   (speed_og/vessel_speed_calm_water) ** q  )
-    
-    return water_drag
-
-    # ensure shapes of u_ship_og and v_ship_og agree
-    if np.array(u_ship_og).shape != np.array(v_ship_og).shape:
-        raise ValueError('Shape of u_ship_og and v_ship_og need to agree.')
-    
-    # calc speed over ground    
-    speed_og = (u_ship_og ** 2 + v_ship_og ** 2) ** 0.5
-    
-    # Polynomial power coefficient
-    q = 0.0 
-    
-    water_drag = (2 * vessel_total_propulsive_efficiency * vessel_maximum_engine_power / vessel_speed_calm_water ** 3 
-                  / physics_surface_water_density / vessel_subsurface_area *
-                  (speed_og/vessel_speed_calm_water) ** q )
     
     return water_drag
 
@@ -239,6 +222,7 @@ def power_maintain_sog(
         * physics_air_mass_density
         * vessel_wind_resistance_coefficient
         * vessel_supersurface_area
+        / vessel_total_propulsive_efficiency
     )
 
     coeff_wave_drag = (
@@ -347,18 +331,25 @@ def power_maintain_sog(
         Speed over ground in [m/s] that ship steams at a given engine power 
         Shape will be identical to course_ship_og.
     """    
+    #coeff_water_drag = (
+    #    0.5
+    #    * physics_surface_water_density
+    #    * water_drag
+    #    * vessel_subsurface_area
+    #)
+
     coeff_water_drag = (
-        0.5
-        * physics_surface_water_density
-        * water_drag
-        * vessel_subsurface_area
+        vessel_maximum_engine_power 
+        * vessel_speed_calm_water 
     )
+
 
     coeff_wind_drag = (
         0.5
         * physics_air_mass_density
         * vessel_wind_resistance_coefficient
         * vessel_supersurface_area
+        / vessel_total_propulsive_efficiency
     )
 
     coeff_wave_drag = (
