@@ -5,8 +5,9 @@ def fuel_consumption_diesel_MANandBW(
     speed_ship_og: npt.ArrayLike =  None,
     engine_power: npt.ArrayLike = None,
     vessel_design_speed = 12.25,    
-    vessel_specific_fuel_consumption = ,
-    vessel_number_active_engines = 1.0,
+    vessel_specific_fuel_consumption = 0.000165,
+    vessel_number_engines_operational = 1.0,
+    vessel_load_per_active_engine = 0.6,
     vessel_maximum_continuous_rating = 0.85,
     **kwargs,
 ) ->npt.ArrayLike:
@@ -21,9 +22,11 @@ def fuel_consumption_diesel_MANandBW(
     vessel_design_speed: float
         Maximum speed overground or design speed of vessel in [m/s]. Defaults to 12.25    
     vessel_specific_fuel_consumption: float
-        specific fuel consumption 
-    vessel_number_active_engines: float
+        specific fuel consumption [kg/Wh]. Default = 0.000165
+    vessel_number_engines_operational: float
         number of available active engines. Default = 1.0  
+    vessel_load_per_active_engine:
+        average load per active engine. Default = 0.6    
     vessel_maximum_continuous_rating: float
         maximum continuous rating of engine power . Default = 0.85
 
@@ -35,20 +38,46 @@ def fuel_consumption_diesel_MANandBW(
         fuel consumption in [kg/s]. Shape will be identical to
         speed_ship_og. 
     """
-    correction_reduced_speed_factor = ((speed_ship_og / vessel_design_speed) + 0.2) / 1.2
+    correction_reduced_speed_factor = (
+        (speed_ship_og / vessel_design_speed) ** 3 + 0.2
+    ) / 1.2
+
+    assumed_maximum_continuous_rating = 0.75
+
+    vessel_number_active_engines = np.min(
+        vessel_number_engines_operational,
+        np.round((correction_reduced_speed_factor * 
+        vessel_number_engines_operational * 
+        assumed_maximum_continuous_rating) + 1)
+        )
     
-    if (vessel_number_active_engines == 1):
-        fuel_consumption = (correction_reduced_speed_factor * vessel_number_active_engines * 
-                            vessel_maximum_continuous_rating * engine_power  * 
-                            vessel_specific_fuel_consumption )
+    fraction_max_continuous_rating = vessel_number_engines_operational / 
+        * correction_reduced_speed_factor 
+        * vessel_maximum_continuous_rating
+
+    if vessel_number_engines_operational == 1:
+        fuel_consumption = (
+            correction_reduced_speed_factor 
+            * vessel_load_per_active_engine
+            * vessel_maximum_continuous_rating 
+            * engine_power  
+            * vessel_specific_fuel_consumption 
+            / 3600
+        )
     else:
-        fuel_consumption = (correction_reduced_speed_factor * vessel_number_active_engines * 
-                            vessel_maximum_continuous_rating * engine_power  * 
-                            vessel_specific_fuel_consumption )
+        fuel_consumption = (
+            correction_reduced_speed_factor 
+            * vessel_load_per_active_engine
+            * vessel_number_active_engines 
+            * fraction_max_continuous_rating 
+            * engine_power  
+            * vessel_specific_fuel_consumption 
+            / 3600
+        )
     return fuel_consumption    
 
 def convert_fuel_consumption_tonnsperday(
-    fuel_consumption: npt.ArrayLike =None,
+    fuel_consumption: npt.ArrayLike = None,
     conversion_factor = 86400000,
     **kwargs,
 ) ->npt.ArrayLike:
@@ -81,33 +110,32 @@ def convert_emission_kgpermeter_kgperNM(
     emission: array
        emission in [kg/m]      
     conversion_factor: float
-       conversion of fuel from kg/s to tonns/day. Defaults to 
+       conversion of fuel from kg/m to kg/NM. Defaults to 1852
        
     Returns
     --------
     array:
-        emission_kgperNM in [kg/m]. Shape will be identical to emission
+        emission_kgperNM in [kg/NM]. Shape will be identical to emission
     """
     emission_kgperNM = conversion_factor * emission 
     return emission_kgperNM
 
 def emission_CO2_diesel_MANandBW(
-    fuel_consumption: npt.ArrayLike = None
-    sailing_time: npt.ArrayLike = None
-    vessel_number_active_engines = 1.0
-    vessel_conversion_factor_fuel_toCO2 = 3.206 
+    fuel_consumption: npt.ArrayLike = None,
+    sailing_time: npt.ArrayLike = None,
+    vessel_number_active_engines = 1.0,
+    vessel_conversion_factor_fuel_toCO2 = 3.200, 
     **kwargs,
-): 
-#  vessel_conversion_factor_fuel_toCO2 3.140 -3.212 [gC0_2/kg of fuel] 
-"""Calculate CO_2 emission for vessel with diesel engine type MAN-B&W.
+) ->npt.ArrayLike: 
+    """Calculate CO_2 emission for vessel with diesel engine type MAN-B&W.
 
     Parameters
     ----------
     fuel_consumption: array
         fuel consumption in [kg/s]     
     sailing_time: array
-        sailing time in seconds.   
-        Shape is identical to fuel_consumption.
+        vessel sailing time in seconds.   
+        Shape is identical to fuel_consumption.  
     vessel_number_active_engines: float
         Number of active engines for vessel. Default = 1 
     vessel_conversion_factor_fuel_toCO2: float
@@ -119,13 +147,13 @@ def emission_CO2_diesel_MANandBW(
     Returns
     -------
     array:
-        total emission in [kg/m]. Shape will be identical to
+        total emission in [kg]. Shape will be identical to
         fuel_consumption. 
     """
-   if (number_active_engines == 1)
-        total_emission = (vessel_conversion_factor_fuel_toCO2 * fuel_consumption * 
-                      sailing_time)
-    else: 
-        total_emission = (conversion_factor_fuel_toCO2 * fuel_consumption * 
-                      sailing_time)
+
+    total_emission = (
+       vessel_conversion_factor_fuel_toCO2 
+       * fuel_consumption 
+       * sailing_time 
+    )
     return total_emission    

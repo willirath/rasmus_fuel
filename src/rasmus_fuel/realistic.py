@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.typing as npt
+import xarray as xr
 
 def froede_number_at_sog(
     speed_ship_og: npt.ArrayLike = None,
@@ -10,7 +11,7 @@ def froede_number_at_sog(
     physics_acceleration_gravity=9.80665,
     **kwargs,
 ) ->npt.ArrayLike:
-    """Calculate vessel Froede number from known speed over ground.
+    """Calculate vessel Froede number from known speed/course over ground.
 
     Parameters
     ----------
