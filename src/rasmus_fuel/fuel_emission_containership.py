@@ -44,12 +44,6 @@ def fuel_consumption_diesel_MANandBW(
 
     assumed_maximum_continuous_rating = 0.75
 
-    vessel_number_active_engines = np.min(
-        vessel_number_engines_operational,
-        np.round((correction_reduced_speed_factor * 
-        vessel_number_engines_operational * 
-        assumed_maximum_continuous_rating) + 1)
-        )
     number_active_engines = (
         np.round((correction_reduced_speed_factor 
         * vessel_number_engines_operational 
