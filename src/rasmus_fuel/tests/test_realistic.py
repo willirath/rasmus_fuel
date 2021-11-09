@@ -18,7 +18,7 @@ def test_realistic_power_maintain_sog_no_movement():
         v_current=0,
         u_wind=0,
         v_wind=0,
-        w_wave_hight=0,
+        w_wave_height=0,
     )
 
 
@@ -30,7 +30,7 @@ def test_realistic_power_maintain_sog_no_drag():
     v_current = np.random.normal(size=(10,))
     v_wind = np.random.normal(size=(10,))
     u_wind = np.random.normal(size=(10,))
-    w_wave_hight = np.random.normal(size=(10,))
+    w_wave_height = np.random.normal(size=(10,))
     np.testing.assert_equal(
         np.zeros(shape=(10,)),
         power_maintain_sog(
@@ -40,8 +40,8 @@ def test_realistic_power_maintain_sog_no_drag():
             v_current=v_current,
             u_wind=u_wind,
             v_wind=v_wind,
-            w_wave_hight=w_wave_hight,
-            vessel_water_drag_coefficient=0,
+            w_wave_height=w_wave_height,
+            vessel_maximum_engine_power=0,  # not really a drag coeff...
             vessel_wind_resistance_coefficient=0,
             vessel_draught=0,
         ),
@@ -58,16 +58,16 @@ def test_power_maintain_sog_isotropic():
             v_current=0,
             u_wind=1,
             v_wind=2,
-            w_wave_hight=0,
+            w_wave_height=0,
         ),
         power_maintain_sog(
             u_ship_og=0,
             u_current=0,
             v_ship_og=1,
             v_current=5,
-            u_wind=1,
-            v_wind=2,
-            w_wave_hight=0,
+            u_wind=2,
+            v_wind=1,
+            w_wave_height=0,
         ),
     )
 
@@ -99,7 +99,7 @@ def test_power_maintain_sog_kwargs_ignored():
             v_current=0,
             u_wind=1,
             v_wind=2,
-            w_wave_hight=0,
+            w_wave_height=0,
             nonexisting_kwarg=1234,
         ),
         power_maintain_sog(
@@ -109,7 +109,7 @@ def test_power_maintain_sog_kwargs_ignored():
             v_current=0,
             u_wind=1,
             v_wind=2,
-            w_wave_hight=0,
+            w_wave_height=0,
         ),
     )
 
