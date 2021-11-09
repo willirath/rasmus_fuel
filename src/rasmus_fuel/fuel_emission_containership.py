@@ -50,27 +50,40 @@ def fuel_consumption_diesel_MANandBW(
         vessel_number_engines_operational * 
         assumed_maximum_continuous_rating) + 1)
         )
+    number_active_engines = (
+        np.round((correction_reduced_speed_factor 
+        * vessel_number_engines_operational 
+        * assumed_maximum_continuous_rating) + 1)
+    )         
     
-    fraction_max_continuous_rating = vessel_number_engines_operational / 
+    vessel_number_active_engines = np.where(
+        number_active_engines > vessel_number_engines_operational, 
+        vessel_number_engines_operational, number_active_engines
+    )
+    fraction_max_continuous_rating = (
+        vessel_number_engines_operational 
+        / vessel_number_active_engines
         * correction_reduced_speed_factor 
         * vessel_maximum_continuous_rating
-
+    )
     if vessel_number_engines_operational == 1:
         fuel_consumption = (
-            correction_reduced_speed_factor 
+            ((correction_reduced_speed_factor 
             * vessel_load_per_active_engine
             * vessel_maximum_continuous_rating 
-            * engine_power  
+            * engine_power)
+            + 0.063 * engine_power)
             * vessel_specific_fuel_consumption 
             / 3600
         )
     else:
         fuel_consumption = (
-            correction_reduced_speed_factor 
+            ((correction_reduced_speed_factor 
             * vessel_load_per_active_engine
             * vessel_number_active_engines 
             * fraction_max_continuous_rating 
-            * engine_power  
+            * engine_power )
+            + 0.063 * engine_power) 
             * vessel_specific_fuel_consumption 
             / 3600
         )
@@ -78,7 +91,7 @@ def fuel_consumption_diesel_MANandBW(
 
 def convert_fuel_consumption_tonnsperday(
     fuel_consumption: npt.ArrayLike = None,
-    conversion_factor = 86400000,
+    conversion_factor = 8.640,
     **kwargs,
 ) ->npt.ArrayLike:
     """Convert vessel fuel consumption from SI units kg/s to tonns/day
@@ -88,7 +101,7 @@ def convert_fuel_consumption_tonnsperday(
     fuel_consumption: array
        fuel consumption in [kg/s]      
     conversion_factor: float
-       conversion of fuel from kg/s to tonns/day. Defaults to 86400000
+       conversion of fuel from kg/s to tonns/day. Defaults to 8.640
        
     Returns
     --------
@@ -123,11 +136,10 @@ def convert_emission_kgpermeter_kgperNM(
 def emission_CO2_diesel_MANandBW(
     fuel_consumption: npt.ArrayLike = None,
     sailing_time: npt.ArrayLike = None,
-    vessel_number_active_engines = 1.0,
     vessel_conversion_factor_fuel_toCO2 = 3.200, 
     **kwargs,
 ) ->npt.ArrayLike: 
-    """Calculate CO_2 emission for vessel with diesel engine type MAN-B&W.
+    """Calculate fuel-based CO_2 emission for vessel with diesel engine type MAN-B&W.
 
     Parameters
     ----------
@@ -136,8 +148,6 @@ def emission_CO2_diesel_MANandBW(
     sailing_time: array
         vessel sailing time in seconds.   
         Shape is identical to fuel_consumption.  
-    vessel_number_active_engines: float
-        Number of active engines for vessel. Default = 1 
     vessel_conversion_factor_fuel_toCO2: float
         conversion factor for diesel type engine from fuel to CO_2 mass [kg fuel/ kg CO_2]. 
         Defaults to 3.206
