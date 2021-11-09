@@ -62,7 +62,7 @@ def power_maintain_sog(
     vessel_maximum_engine_power: float
         vessel maximu engine power in [W]. Defaults to 14296344.0,
     vessel_speed_calm_water: float
-        vessel speed maximum in calm water [m/s]. Defaults 9.259           
+        vessel speed maximum in calm water [m/s]. Defaults 9.259
     vessel_draught: float
         vessel draught in [m]. Defaults to 11.5
     physics_air_mass_density: float
@@ -88,7 +88,7 @@ def power_maintain_sog(
 
     # ensure shapes of u_ship_og and v_ship_og agree
     if np.array(u_ship_og).shape != np.array(v_ship_og).shape:
-        raise ValueError("Shape of u_ship_og and v_ship_og need to agree.")
+        raise ValueError('Shape of u_ship_og and v_ship_og need to agree.')
 
     # calc velocities through water
     u_ship_tw = u_ship_og - u_current
@@ -188,11 +188,7 @@ def power_to_fuel_consump(
     """
 
     fuel_consump = (
-        vessel_specific_fuel_consumption
-        * engine_power
-        * steaming_time
-        / vessel_DWT
-        / distance
+        vessel_specific_fuel_consumption * engine_power * steaming_time / vessel_DWT / distance
     )
 
     return fuel_consump
