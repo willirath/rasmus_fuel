@@ -2,6 +2,7 @@ import numpy as np
 import numpy.typing as npt
 import xarray as xr
 
+
 def froede_number_at_sog(
     speed_ship_og: npt.ArrayLike = None,
     course_ship_og: npt.ArrayLike = None,
@@ -10,7 +11,7 @@ def froede_number_at_sog(
     vessel_waterline_length=210.0,
     physics_acceleration_gravity=9.80665,
     **kwargs,
-) ->npt.ArrayLike:
+) -> npt.ArrayLike:
     """Calculate vessel Froede number from known speed/course over ground.
 
     Parameters
@@ -18,13 +19,13 @@ def froede_number_at_sog(
     speed_ship_og: array
         Ship speed over ground in meters per second.
     course_ship_og: array
-        Course ship over ground in rad (0 for North, pi/2 for East direction)    
+        Course ship over ground in rad (0 for North, pi/2 for East direction)
     u_current: array
         Ocean currents eastward speed over ground in meters per second.
         Needs shape that can be broadcast to shape of u_ship_og and v_ship_og.
     v_current: array
         Ocean currents northward speed over ground in meters per second.
-        Needs shape that can be broadcast to shape of u_ship_og and v_ship_og.    
+        Needs shape that can be broadcast to shape of u_ship_og and v_ship_og.
     vessel_waterline_length: float
         length of vessel at the waterline in [m]. Defaults to 210
     physics_acceleration_gravity: float
@@ -39,20 +40,19 @@ def froede_number_at_sog(
         u_ship_og and v_ship_og.
     """
     # ensure shapes of u_ship_og and v_ship_og agree
-    if np.array(u_ship_og).shape != np.array(v_ship_og).shape:
-        raise ValueError('Shape of u_ship_og and v_ship_og need to agree.')
+    if np.array(speed_ship_og).shape != np.array(course_ship_og).shape:
+        raise ValueError('Shape of speed_ship_og and course_ship_og need to agree.')
 
     # calc speed through water
-    u_ship_tw = speed_ship_og * np.cos(course_ship_og + np.pi/2) - u_current
-    v_ship_tw = speed_ship_og * np.sin(course_ship_og + np.pi/2)  - v_current
-    
+    u_ship_tw = speed_ship_og * np.cos(course_ship_og + np.pi / 2) - u_current
+    v_ship_tw = speed_ship_og * np.sin(course_ship_og + np.pi / 2) - v_current
 
     # calc engine power to maintain speed over ground using ocean current resistance term
     speed_tw = (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
 
-
-    froede_number = speed_tw/np.sqrt(physics_acceleration_gravity * vessel_waterline_length)
+    froede_number = speed_tw / np.sqrt(physics_acceleration_gravity * vessel_waterline_length)
     return froede_number
+
 
 def vessel_water_drag(
     u_ship_og: npt.ArrayLike = None,
@@ -62,7 +62,7 @@ def vessel_water_drag(
     vessel_maximum_engine_power=14296344.0,
     vessel_speed_calm_water=9.259,
     physics_surface_water_density=1029.0,
-) ->npt.ArrayLike:
+) -> npt.ArrayLike:
     """Calculate quadratic drag law power needed to maintain speed over ground.
 
     Parameters
@@ -79,7 +79,7 @@ def vessel_water_drag(
     vessel_maximum_engine_power: float
         vessel maximu engine power in [W]. Defaults to 14296344.0,
     vessel_speed_calm_water: float
-        vessel speed maximum in calm water [m/s]. Defaults 9.259    
+        vessel speed maximum in calm water [m/s]. Defaults 9.259
     physics_surface_water_density: float
        density of surface water [kg/m**3]. Defaults to 1029
 
@@ -89,30 +89,57 @@ def vessel_water_drag(
     -------
     array:
         vessel water drag. Shape will be identical to
-        u_ship_og and v_ship_og unless q = 0. 
+        u_ship_og and v_ship_og unless q = 0.
     """
-    
-     # ensure shapes of u_ship_og and v_ship_og agree
+
+    # ensure shapes of u_ship_og and v_ship_og agree
     if np.array(u_ship_og).shape != np.array(v_ship_og).shape:
         raise ValueError('Shape of u_ship_og and v_ship_og need to agree.')
-    
-    # calc speed over ground    
+
+    # calc speed over ground
     speed_og = (u_ship_og ** 2 + v_ship_og ** 2) ** 0.5
-    
+
     # Polynomial power coefficient
-    q = 1.0 
-    
-    water_drag = (2 * vessel_total_propulsive_efficiency * vessel_maximum_engine_power / vessel_speed_calm_water ** 3 
-                  / physics_surface_water_density / vessel_subsurface_area * 
-                  (speed_og/vessel_speed_calm_water) ** q  )
-    
+    q = 1.0
+
+    water_drag = (
+        2
+        * vessel_total_propulsive_efficiency
+        * vessel_maximum_engine_power
+        / vessel_speed_calm_water ** 3
+        / physics_surface_water_density
+        / vessel_subsurface_area
+        * (speed_og / vessel_speed_calm_water) ** q
+    )
+
     return water_drag
 
-def find_roots(p,q,diskr):
-    root = np.where(np.isnan(diskr), float("NaN"), np.where((diskr < 0), float("NaN"),
-           np.where((diskr>0), (np.abs(-q/2 + np.sqrt(np.abs(diskr)))) ** (1/3)-(np.abs(q/2 + np.sqrt(np.abs(diskr)))) ** (1/3), 
-           np.where(np.isnan(q), float("NaN"), np.where(q<0, 2* (np.abs(q)/2) ** (1/3), (np.abs(q)/2) ** (1/3)))))) 
-    return root      
+
+def find_roots(p, q, diskr):
+    root = np.where(
+        np.isnan(diskr),
+        float('NaN'),
+        np.where(
+            (diskr < 0),
+            float('NaN'),
+            np.where(
+                (diskr > 0),
+                (np.abs(-q / 2 + np.sqrt(np.abs(diskr)))) ** (1 / 3)
+                - (np.abs(q / 2 + np.sqrt(np.abs(diskr)))) ** (1 / 3),
+                np.where(
+                    np.isnan(q),
+                    float('NaN'),
+                    np.where(
+                        q < 0,
+                        2 * (np.abs(q) / 2) ** (1 / 3),
+                        (np.abs(q) / 2) ** (1 / 3),
+                    ),
+                ),
+            ),
+        ),
+    )
+    return root
+
 
 def power_maintain_sog(
     u_ship_og: npt.ArrayLike = None,
@@ -126,7 +153,7 @@ def power_maintain_sog(
     vessel_waterline_length=210.0,
     vessel_total_propulsive_efficiency=0.7,
     vessel_maximum_engine_power=14296344.0,
-    vessel_speed_calm_water=9.259,   
+    vessel_speed_calm_water=9.259,
     vessel_draught=11.5,
     vessel_supersurface_area=345.0,
     physics_air_mass_density=1.225,
@@ -174,7 +201,7 @@ def power_maintain_sog(
     vessel_maximum_engine_power: float
         vessel maximu engine power in [W]. Defaults to 14296344.0,
     vessel_speed_calm_water: float
-        vessel speed maximum in calm water [m/s]. Defaults 9.259           
+        vessel speed maximum in calm water [m/s]. Defaults 9.259
     vessel_draught: float
         vessel draught in [m]. Defaults to 11.5
     physics_air_mass_density: float
@@ -205,23 +232,20 @@ def power_maintain_sog(
     # calc speed through water
     u_ship_tw = u_ship_og - u_current
     v_ship_tw = v_ship_og - v_current
-    
-    # calc speed over ground    
+
+    # calc speed over ground
     speed_og = (u_ship_og ** 2 + v_ship_og ** 2) ** 0.5
 
     # calc engine power to maintain speed over ground using ocean current resistance term
     speed_tw = (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
 
-   # coeff_water_drag = (
-   #     0.5
-   #     * physics_surface_water_density
-   #     * water_drag
-   #     * vessel_subsurface_area
-   # )
-    coeff_water_drag = (
-        vessel_maximum_engine_power 
-        / vessel_speed_calm_water ** 3 
-    )
+    # coeff_water_drag = (
+    #     0.5
+    #     * physics_surface_water_density
+    #     * water_drag
+    #     * vessel_subsurface_area
+    # )
+    coeff_water_drag = vessel_maximum_engine_power / vessel_speed_calm_water ** 3
     power_needed = coeff_water_drag * (speed_tw ** 3)
 
     # calc engine power to maintain speed over ground using : (1) ocean current resistance, (2) wind resistance, (3) wave resistance
@@ -245,7 +269,8 @@ def power_maintain_sog(
         / vessel_reference_froede_number
         * physics_spectral_average
         * physics_surface_water_density
-        * w_wave_height ** 2 / 4
+        * w_wave_height ** 2
+        / 4
         * vessel_waterline_width ** 2
         * (physics_acceleration_gravity / vessel_waterline_length ** 3) ** 0.5
         * vessel_draught ** 0.62
@@ -258,10 +283,10 @@ def power_maintain_sog(
         + coeff_wind_drag * speed_rel_to_wind ** 2 * speed_og
         + coeff_wave_drag * speed_og ** 2
     )
-
     return power_needed
 
- def speed_og_from_power(
+
+def speed_og_from_power(
     course_ship_og: npt.ArrayLike = None,
     u_current: npt.ArrayLike = None,
     v_current: npt.ArrayLike = None,
@@ -276,7 +301,7 @@ def power_maintain_sog(
     vessel_supersurface_area=345.0,
     vessel_subsurface_area=245.0,
     vessel_maximum_engine_power=14296344.0,
-    vessel_speed_calm_water=9.259, 
+    vessel_speed_calm_water=9.259,
     physics_air_mass_density=1.225,
     vessel_wind_resistance_coefficient=0.4,
     vessel_reference_froede_number=17.6,
@@ -284,7 +309,7 @@ def power_maintain_sog(
     physics_surface_water_density=1029.0,
     physics_acceleration_gravity=9.80665,
     **kwargs,
- )  ->npt.ArrayLike:
+) -> npt.ArrayLike:
     """Calculate speed over ground from a given engine power.
 
     Parameters
@@ -292,7 +317,7 @@ def power_maintain_sog(
     course_ship_og: array
         Course ship over ground in rad (0 for North, pi/2 for East direction)
     speed_ship_init_og: array
-        Initial guess for speed over ground (m/s)   
+        Initial guess for speed over ground (m/s)
     u_current: array
         Ocean currents eastward speed over ground in meters per second.
         Needs shape that can be broadcast to shape of course_ship_og.
@@ -310,10 +335,10 @@ def power_maintain_sog(
         Needs shape that can be broadcst to shape of course_ship_og
     engine_power: array
         Engine power in W (=kg*m2/s3)
-        Needs shape that can be broadcst to shape of u_ship_og and v_ship_og 
+        Needs shape that can be broadcst to shape of u_ship_og and v_ship_og
     water_drag: float
-        water drag coefficient for vessel, 
-        Is of shape of u_ship_og and v_ship_og        
+        water drag coefficient for vessel,
+        Is of shape of u_ship_og and v_ship_og
     vessel_supersurface_area: float
         area of the above water vessel structure exposed to wind [m ** 2]. Defaults to 345
     vessel_subsurface_area: float
@@ -342,21 +367,25 @@ def power_maintain_sog(
     Returns
     -------
     array:
-        Speed over ground in [m/s] that ship steams at a given engine power 
+        Speed over ground in [m/s] that ship steams at a given engine power
         Shape will be identical to course_ship_og.
-    """    
-    #coeff_water_drag = (
+    """
+    # coeff_water_drag = (
     #    0.5
     #    * physics_surface_water_density
     #    * water_drag
     #    * vessel_subsurface_area
-    #)
+    # )
 
-    coeff_water_drag = (
-        vessel_maximum_engine_power 
-        * vessel_speed_calm_water ** 3
-    )
+    # ensure shapes of course_ship_og and u_current agree
+    if np.array(course_ship_og).shape != np.array(u_current).shape:
+        raise ValueError('Shape of course_ship_og and u_current need to agree.')
 
+    # ensure shapes of course_ship_og and v_current agree
+    if np.array(course_ship_og).shape != np.array(v_current).shape:
+        raise ValueError('Shape of course_ship_og and v_current need to agree.')
+
+    coeff_water_drag = vessel_maximum_engine_power * vessel_speed_calm_water ** 3
 
     coeff_wind_drag = (
         0.5
@@ -375,32 +404,49 @@ def power_maintain_sog(
         * physics_spectral_average
         * physics_surface_water_density
         * vessel_waterline_width ** 2
-        * w_wave_height ** 2 / 4
+        * w_wave_height ** 2
+        / 4
         * (physics_acceleration_gravity / vessel_waterline_length ** 3) ** 0.5
         * vessel_draught ** 0.62
         * 0.25
     )
-  
-    k3 = coeff_water_drag + coeff_wind_drag
-    k2 = (- 2 * coeff_water_drag * (u_current * np.cos(course_ship_og + np.pi/2) + 
-              v_current * np.sin(course_ship_og + np.pi/2)) 
-              - 2 * coeff_wind_drag * (u_wind * np.cos(course_ship_og + np.pi/2) + 
-              v_wind * np.sin(course_ship_og + np.pi/2))
-              + coeff_wave_drag)
-    k1 =  (coeff_water_drag * (u_current ** 2  + v_current ** 2) + 
-                   coeff_wind_drag * (u_wind ** 2  + v_wind ** 2) )  
-    k0 = - engine_power
- 
-    p = (3 * k3*k1 - k2 ** 2) / 3 / k3 ** 2
-    
-    q = (2 * k2 ** 3 - 9 * k3 * k2 * k1 + 27 * k3**2 * k0) / 27 / k3 **3
 
-    diskrQ = p **3 / 27 + q **2 / 4
-    
-    root = xr.apply_ufunc(find_roots, p, q, diskrQ)
-    
-    speed_og = root - k2 / 3 / k3   
+    k3 = coeff_water_drag + coeff_wind_drag
+
+    k2 = (
+        -2
+        * coeff_water_drag
+        * (
+            u_current * np.cos(course_ship_og + np.pi / 2)
+            + v_current * np.sin(course_ship_og + np.pi / 2)
+        )
+        - 2
+        * coeff_wind_drag
+        * (
+            u_wind * np.cos(course_ship_og + np.pi / 2)
+            + v_wind * np.sin(course_ship_og + np.pi / 2)
+        )
+        + coeff_wave_drag
+    )
+    k1 = coeff_water_drag * (u_current ** 2 + v_current ** 2) + coeff_wind_drag * (
+        u_wind ** 2 + v_wind ** 2
+    )
+    k0 = -engine_power
+
+    p = (3 * k3 * k1 - k2 ** 2) / 3
+
+    q = (2 * k2 ** 3 - 9 * k3 * k2 * k1 + 27 * k3 ** 2 * k0) / 27
+
+    diskrQ = p ** 3 / 27 + q ** 2 / 4
+
+    root = xr.apply_ufunc(find_roots, p * k3 ** 6, q * k3 ** 6, diskrQ)
+
+    speed_og = np.where(np.abs(k3) < (10e-3), 0, (root - k2 / 3 / (k3 + 10e-6)))
+
+    speed_og = np.where(engine_power > 10e-3, speed_og, 0)
+
     return speed_og
+
 
 def power_to_fuel_burning_rate(
     power: npt.ArrayLike = None, efficiency: float = 0.5, fuel_value: float = 42.0e6
