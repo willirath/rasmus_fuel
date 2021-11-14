@@ -27,11 +27,11 @@ In the model the convension of SI units for all parameters is implemented. Input
 Depending on number of oepartional engines two alternative formulas for fuel consumption is implemented.
 To estimate a total fuel consumption with a single operational engine and auxiliary engine power the formulas is used:
 
-**Fuel_Consumption = (CRScor * MCR * Engine_Power  * Load_Factor + FCaux)* SFOC * /3600 **     
+**Fuel_Consumption = (CRScor * MCR * Engine_Power  * Load_Factor + FCaux)* SFOC * /3600**     
 
 where **CRScor** is a correction reduced speed factor evaluated as given:
 
-**CRScor = ((V_{actual}/V_{design}) ^ 3 + 0.2) / 1.2, **
+**CRScor = ((V_{actual}/V_{design}) ^ 3 + 0.2) / 1.2,**
 
 **V_{actual}**  and **V_{design}** are vessel speeds operational and design. 
 
@@ -43,7 +43,7 @@ for simplicity in the model **FCaux = 0.63 * Engine_Power**
 
 For a case when a number of operational engines of vessel > 1 the formula for a fuel consumption recasts to:
 
-**Fuel_Consumption = (CRScor * Number_Active_Engines * fMCR * Engine_Power  * Load_Factor + FCaux)* SFOC * /3600 ** 
+**Fuel_Consumption = (CRScor * Number_Active_Engines * fMCR * Engine_Power  * Load_Factor + FCaux)* SFOC * /3600** 
 
 where **fMCR** is a fraction of maximum continuous rating which is equal to:
 
@@ -51,11 +51,11 @@ where **fMCR** is a fraction of maximum continuous rating which is equal to:
 
 To calculated a number of active engines the relationship is used:
 
-**Number_Active_Engines = min(Engines_Operational, round(CRScor * Engines_Operational * MCR)+1) **
+**Number_Active_Engines = min(Engines_Operational, round(CRScor * Engines_Operational * MCR)+1)**
 
 As for total fuel-based CO_2 emission per a single voyage the formula is used: 
 
-**Emission = Conversion_Factor_Fuel_toCO2 * Fuel_Consumption * Sailing_Time, **   
+**Emission = Conversion_Factor_Fuel_toCO2 * Fuel_Consumption * Sailing_Time,**   
 
 where **Sailing_Time** is a single voyage time.
 
