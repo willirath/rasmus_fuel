@@ -42,6 +42,7 @@ extensions = [
     'sphinx.ext.extlinks',
     'sphinx_autosummary_accessors',
     'nbsphinx',
+    'myst_parser',
 ]
 
 extlinks = {
