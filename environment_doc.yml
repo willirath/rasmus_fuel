@@ -3,6 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.9.6
+  - myst-parser
   - numpy=1.21.1
   - sphinx=4.1.2
   - sphinx-autosummary-accessors=0.2.1
