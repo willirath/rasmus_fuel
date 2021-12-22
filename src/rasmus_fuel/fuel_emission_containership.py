@@ -5,11 +5,11 @@ import numpy.typing as npt
 def fuel_consumption_diesel_MANandBW(
     speed_ship_og: npt.ArrayLike = None,
     engine_power: npt.ArrayLike = None,
-    vessel_design_speed=12.25,
-    vessel_specific_fuel_consumption=0.000165,
-    vessel_number_engines_operational=1.0,
-    vessel_load_per_active_engine=0.6,
-    vessel_maximum_continuous_rating=0.85,
+    vessel_design_speed: float = 12.25,
+    vessel_specific_fuel_consumption: float = 0.000165,
+    vessel_number_engines_operational: float = 1.0,
+    vessel_load_per_active_engine: float = 0.6,
+    vessel_maximum_continuous_rating: float = 0.85,
     **kwargs,
 ) -> npt.ArrayLike:
     """Calculate vessel fuel consumption using diesel engine MANB&W characteristics
@@ -49,14 +49,12 @@ def fuel_consumption_diesel_MANandBW(
 
     assumed_maximum_continuous_rating = 0.75
 
-    number_active_engines = np.round(
-        (
+    number_active_engines = np.ceil(
             correction_reduced_speed_factor
             * vessel_number_engines_operational
             * assumed_maximum_continuous_rating
-        )
-        + 1
     )
+  
 
     vessel_number_active_engines = np.where(
         number_active_engines > vessel_number_engines_operational,
@@ -98,13 +96,13 @@ def fuel_consumption_diesel_MANandBW(
             * vessel_specific_fuel_consumption
             / 3600
         )
-    fuel_consumption = np.where(np.abs(speed_ship_og) > 10e-4, fuel_consumption, 0)
+
     return fuel_consumption
 
 
 def convert_fuel_consumption_tonnsperday(
     fuel_consumption: npt.ArrayLike = None,
-    conversion_factor=8.640,
+    conversion_factor: float = 8.640,
     **kwargs,
 ) -> npt.ArrayLike:
     """Convert vessel fuel consumption from SI units kg/s to tonns/day
@@ -127,7 +125,7 @@ def convert_fuel_consumption_tonnsperday(
 
 def convert_emission_kgpermeter_kgperNM(
     emission: npt.ArrayLike = None,
-    conversion_factor=1852,
+    conversion_factor: float = 1852,
     **kwargs,
 ) -> npt.ArrayLike:
     """Convert vessel emission from SI units kg/m to kg/NM
@@ -151,7 +149,7 @@ def convert_emission_kgpermeter_kgperNM(
 def emission_CO2_diesel_MANandBW(
     fuel_consumption: npt.ArrayLike = None,
     sailing_time: npt.ArrayLike = None,
-    vessel_conversion_factor_fuel_toCO2=3.200,
+    vessel_conversion_factor_fuel_toCO2: float = 3.200,
     **kwargs,
 ) -> npt.ArrayLike:
     """Calculate fuel-based CO_2 emission for vessel with diesel engine type MAN-B&W.
