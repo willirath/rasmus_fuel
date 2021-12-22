@@ -61,7 +61,7 @@ where $Sailing_Time$ is a single voyage time.
 
 ## Literature
 
-[1] D.R. Schouten, T.W.F. Hasselaar Ship emision model validation with noon reports, 2018 Marin Report No. 30799-1-TM (v3) [http://www.emissieregistratie.nl/erpubliek/documenten/Lucht%20(Air)/Verkeer%20en%20Vervoer%20(Transport)/Zeescheepvaart/MARIN%20(2018)%20Ship%20Emission%20Validation%20with%20Noon%20reports_V3.pdf]
+[1] [D.R. Schouten, T.W.F. Hasselaar Ship emision model validation with noon reports, 2018 Marin Report No. 30799-1-TM (v3)] (http://www.emissieregistratie.nl/erpubliek/documenten/Lucht%20(Air)/Verkeer%20en%20Vervoer%20(Transport)/Zeescheepvaart/MARIN%20(2018)%20Ship%20Emission%20Validation%20with%20Noon%20reports_V3.pdf)
 
 ## Install
 
