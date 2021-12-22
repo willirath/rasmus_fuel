@@ -126,11 +126,25 @@ def power_maintain_sog(
         * 0.25
     )
 
-    # TODO: chec reference systems!
-    power_needed = (
-        coeff_water_drag * (speed_tw ** 2) * speed_og
-        + coeff_wind_drag * speed_rel_to_wind ** 2 * speed_og
-        + coeff_wave_drag * speed_og ** 2
+    # Refrence frame relative to water
+    wave_resistance_x = coeff_wave_drag * u_ship_tw 
+    water_resistance_x = coeff_water_drag * speed_tw * u_ship_tw
+    wind_resistance_x = coeff_wind_drag * speed_rel_to_wind ** 2 
+
+    wave_resistance_y = coeff_wave_drag * v_ship_tw 
+    water_resistance_y = coeff_water_drag * speed_tw * v_ship_tw
+    wind_resistance_y = coeff_wind_drag * speed_rel_to_wind ** 2 
+
+    resistance_x = wave_resistance_x + water_resistance_x + wind_resistance_x
+    resistance_y = wave_resistance_y + water_resistance_y + wind_resistance_y
+
+    power_needed = resistance_x * u_ship_tw + resistance_y * v_ship_tw
+    
+    # Reference frame Earth's observer
+    #power_needed = (
+    #    coeff_water_drag * (speed_tw ** 2) * speed_og
+    #    + coeff_wind_drag * speed_rel_to_wind ** 2 * speed_og
+    #    + coeff_wave_drag * speed_og ** 2
     )
 
     return power_needed
