@@ -98,6 +98,19 @@ def power_maintain_sog(
     speed_og = (u_ship_og ** 2 + v_ship_og ** 2) ** 0.5
     speed_tw = (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
     speed_rel_to_wind = ((u_ship_og - u_wind) ** 2 + (v_ship_og - v_wind) ** 2) ** 0.5
+    
+     # calc wind direction and speed
+    angle_wind = np.arctan2(v_wind, u_wind)
+    speed_wind = (u_wind ** 2 + v_wind ** 2) ** 0.5
+
+    # calc angle between wind and speed through water 
+    angle_ship_wind = np.arccos(
+        (u_wind * u_ship_tw  + v_wind * v_ship_tw) / speed_tw / wind_speed
+    )
+
+    # calc projection of ship velocity through water on wind components
+    u_speed_rel_to_wind = speed_tw * np.cos(angle_ship_wind) * np.cos(angle_wind)
+    v_speed_rel_to_wind = speed_tw * np.cos(angle_ship_wind) * np.sin(angle_wind)
 
     # drag coefficients
     coeff_water_drag = vessel_maximum_engine_power / vessel_speed_calm_water ** 3
@@ -126,19 +139,17 @@ def power_maintain_sog(
         * 0.25
     )
 
-    # Refrence frame relative to water
+    # Reference frame is relative to water
     wave_resistance_x = coeff_wave_drag * u_ship_tw 
     water_resistance_x = coeff_water_drag * speed_tw * u_ship_tw
-    wind_resistance_x = coeff_wind_drag * speed_rel_to_wind ** 2 
+    wind_resistance_x = coeff_wind_drag * speed_rel_to_wind * u_speed_rel_to_wind 
 
     wave_resistance_y = coeff_wave_drag * v_ship_tw 
     water_resistance_y = coeff_water_drag * speed_tw * v_ship_tw
-    wind_resistance_y = coeff_wind_drag * speed_rel_to_wind ** 2 
+    wind_resistance_y = coeff_wind_drag * speed_rel_to_wind * v_speed_rel_to_wind 
 
-    resistance_x = wave_resistance_x + water_resistance_x + wind_resistance_x
-    resistance_y = wave_resistance_y + water_resistance_y + wind_resistance_y
-
-    power_needed = resistance_x * u_ship_tw + resistance_y * v_ship_tw
+    power_needed  = ((wave_resistance_x + water_resistance_x + wind_resistance_x) * u_ship_tw 
+                     + wave_resistance_y + water_resistance_y + wind_resistance_y) * v_ship_tw 
     
     # Reference frame Earth's observer
     #power_needed = (
