@@ -95,17 +95,21 @@ def power_maintain_sog(
     v_ship_tw = v_ship_og - v_current
 
     # calc speeds (over ground, through water, relative to wind)
-    speed_og = (u_ship_og ** 2 + v_ship_og ** 2) ** 0.5
+    # speed_og = (u_ship_og ** 2 + v_ship_og ** 2) ** 0.5
     speed_tw = (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
     speed_rel_to_wind = ((u_ship_og - u_wind) ** 2 + (v_ship_og - v_wind) ** 2) ** 0.5
-    
-     # calc wind direction and speed
+
+    # calc wind direction and speed
     angle_wind = np.arctan2(v_wind, u_wind)
     speed_wind = (u_wind ** 2 + v_wind ** 2) ** 0.5
 
-    # calc angle between wind and speed through water 
-    angle_ship_wind = np.arccos(
-        (u_wind * u_ship_tw  + v_wind * v_ship_tw) / speed_tw / wind_speed
+    # calc angle between wind and speed through water
+    angle_ship_wind = np.where(
+        ((speed_tw > 10e-4) & (speed_wind > 10e-4)),
+        np.arccos(
+            (u_wind * u_ship_tw + v_wind * v_ship_tw) / (speed_tw + 10e-6) / (speed_wind + 10e-6)
+        ),
+        0,
     )
 
     # calc projection of ship velocity through water on wind components
@@ -140,24 +144,23 @@ def power_maintain_sog(
     )
 
     # Reference frame is relative to water
-    wave_resistance_x = coeff_wave_drag * u_ship_tw 
+    wave_resistance_x = coeff_wave_drag * u_ship_tw
     water_resistance_x = coeff_water_drag * speed_tw * u_ship_tw
-    wind_resistance_x = coeff_wind_drag * speed_rel_to_wind * u_speed_rel_to_wind 
+    wind_resistance_x = coeff_wind_drag * speed_rel_to_wind * u_speed_rel_to_wind
 
-    wave_resistance_y = coeff_wave_drag * v_ship_tw 
+    wave_resistance_y = coeff_wave_drag * v_ship_tw
     water_resistance_y = coeff_water_drag * speed_tw * v_ship_tw
-    wind_resistance_y = coeff_wind_drag * speed_rel_to_wind * v_speed_rel_to_wind 
+    wind_resistance_y = coeff_wind_drag * speed_rel_to_wind * v_speed_rel_to_wind
 
-    power_needed  = ((wave_resistance_x + water_resistance_x + wind_resistance_x) * u_ship_tw 
-                     + wave_resistance_y + water_resistance_y + wind_resistance_y) * v_ship_tw 
-    
+    power_needed = (wave_resistance_x + water_resistance_x + wind_resistance_x) * u_ship_tw + (
+        wave_resistance_y + water_resistance_y + wind_resistance_y
+    ) * v_ship_tw
     # Reference frame Earth's observer
-    #power_needed = (
+    # power_needed = (
     #    coeff_water_drag * (speed_tw ** 2) * speed_og
     #    + coeff_wind_drag * speed_rel_to_wind ** 2 * speed_og
     #    + coeff_wave_drag * speed_og ** 2
-    )
-
+    # )
     return power_needed
 
 
