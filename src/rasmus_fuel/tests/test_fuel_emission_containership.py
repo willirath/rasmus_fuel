@@ -89,4 +89,27 @@ def test_convert_emission_kgpermeter_kgperNM_conversion_zero():
     )
 
 
-# TODO: test with actual numbers for plausibility checks
+def test_emission_CO2_diesel_MANandBW():
+    """Check correct units of input time """
+    with pytest.raises(ValueError) as execinfo:
+        emission_CO2_diesel_MANandBW(
+            sailing_time=1.6,
+        )
+    assert str(execinfo.value) == 'Sailing time in seconds should be provided.'
+
+
+def test_conversion_CO2_emission_CO2_diesel_MANandBW():
+    """Check for erroneous conversion factor to CO2 """
+    with pytest.raises(ValueError) as execinfo:
+        emission_CO2_diesel_MANandBW(
+            vessel_conversion_factor_fuel_toCO2=-3.6,
+        )
+        emission_CO2_diesel_MANandBW(
+            vessel_conversion_factor_fuel_toCO2=1000.0,
+        )
+        emission_CO2_diesel_MANandBW(
+            vessel_conversion_factor_fuel_toCO2=0.0,
+        )
+    assert (
+        str(execinfo.value) == 'Vessel conversion factor is a positive constant, not exceeding 10.'
+    )
