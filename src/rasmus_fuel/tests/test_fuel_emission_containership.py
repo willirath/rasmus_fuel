@@ -89,14 +89,16 @@ def test_convert_emission_kgpermeter_kgperNM_conversion_zero():
     )
 
 
-def test_emission_CO2_diesel_MANandBW():
+def test_emission_CO2_diesel_MANandBW_example_values():
     """Check correct units of input time """
-    with pytest.raises(ValueError) as execinfo:
+    np.testing.assert.close(
+        64.12,
         emission_CO2_diesel_MANandBW(
-            fuel_consumption=25.0,
-            sailing_time=1.6,
+            fuel_consumption=10.0,
+            sailing_time=2.0,
+            vessel_conversion_factor_fuel_toCO2=3.206,
         )
-    assert str(execinfo.value) == 'Sailing time in seconds should be provided.'
+    )
 
 
 def test_conversion_CO2_emission_CO2_diesel_MANandBW():
