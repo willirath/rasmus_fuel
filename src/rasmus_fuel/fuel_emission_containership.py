@@ -50,11 +50,10 @@ def fuel_consumption_diesel_MANandBW(
     assumed_maximum_continuous_rating = 0.75
 
     number_active_engines = np.ceil(
-            correction_reduced_speed_factor
-            * vessel_number_engines_operational
-            * assumed_maximum_continuous_rating
+        correction_reduced_speed_factor
+        * vessel_number_engines_operational
+        * assumed_maximum_continuous_rating
     )
-  
 
     vessel_number_active_engines = np.where(
         number_active_engines > vessel_number_engines_operational,

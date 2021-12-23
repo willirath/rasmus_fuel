@@ -206,4 +206,3 @@ def energy_efficiency_per_time_distance(
 
     energy_efficiency = vessel_conversion_factor_fuelmass2CO2 * fuel_consumption
     return energy_efficiency
-
