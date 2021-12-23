@@ -123,7 +123,7 @@ def power_maintain_sog(
         * 0.25
     )
 
-    # The Earth reference frame model
+    # TODO: chec reference systems!
     power_needed = (
         coeff_water_drag * (speed_tw ** 2) * speed_og
         + coeff_wind_drag * speed_rel_to_wind ** 2 * speed_og
