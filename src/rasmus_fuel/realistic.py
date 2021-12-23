@@ -26,7 +26,6 @@ def power_maintain_sog(
     **kwargs,
 ) -> npt.ArrayLike:
     """Calculate quadratic drag law power needed to maintain speed over ground.
-
     Parameters
     ----------
     u_ship_og: array
@@ -75,9 +74,7 @@ def power_maintain_sog(
        density of surface water [kg/m**3]. Defaults to 1029
     physics_acceleration_gravity: float
        the Earth gravity accleration [m/s**2]. Defaults to 9.80665
-
     All other keyword arguments will be ignored.
-
     Returns
     -------
     array:
@@ -155,7 +152,6 @@ def power_to_fuel_burning_rate(
     power: npt.ArrayLike = None, efficiency: float = 0.5, fuel_value: float = 42.0e6
 ) -> npt.ArrayLike:
     """Convert power to fuel buring rate.
-
     Parameters
     ----------
     power: array
@@ -164,7 +160,6 @@ def power_to_fuel_burning_rate(
         Fraction of fuel value turned into propulsive force. Defaults to 0.5.
     fuel_value: float
         Fuel value in J/kg. Defaults to 42.0e6.
-
     Returns
     -------
     array
@@ -182,7 +177,6 @@ def power_to_fuel_consump(
     vessel_DWT: float = 33434.0,
 ) -> npt.ArrayLike:
     """Convert engine power to fuel consumed per vessel weight per distance and unit time.
-
     Parameters
      ----------
      engine_power: array
@@ -195,7 +189,6 @@ def power_to_fuel_consump(
          specific fuel consumption  [g/kWh]. Defaults to 180
      vessel_DWT: float
          vessel dead weight in kg. Defaults to 33434
-
      Returns
      -------
      array
@@ -214,14 +207,12 @@ def energy_efficiency_per_time_distance(
     vessel_conversion_factor_fuelmass2CO2=3.2060,
 ) -> npt.ArrayLike:
     """Convert engine power to fuel consumed per vessel weight per distance and unit time.
-
     Parameters
     ----------
     fuel_consumption: array
         fuel consumption kWh/kg/m
     vessel_conversion_factor_fuelmass2CO2: float
         conversion factor from fuel consumption to mass of CO2 emmitted (diesel/gas oil). Defaults to 3.2060
-
     Returns
     -------
     array
