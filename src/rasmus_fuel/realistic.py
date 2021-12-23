@@ -99,22 +99,9 @@ def power_maintain_sog(
     speed_tw = (u_ship_tw ** 2 + v_ship_tw ** 2) ** 0.5
     speed_rel_to_wind = ((u_ship_og - u_wind) ** 2 + (v_ship_og - v_wind) ** 2) ** 0.5
 
-    # calc wind direction and speed
-    angle_wind = np.arctan2(v_wind, u_wind)
-    speed_wind = (u_wind ** 2 + v_wind ** 2) ** 0.5
-
-    # calc angle between wind and speed through water
-    angle_ship_wind = np.where(
-        ((speed_tw > 10e-4) & (speed_wind > 10e-4)),
-        np.arccos(
-            (u_wind * u_ship_tw + v_wind * v_ship_tw) / (speed_tw + 10e-6) / (speed_wind + 10e-6)
-        ),
-        0,
-    )
-
-    # calc projection of ship velocity through water on wind components
-    u_speed_rel_to_wind = speed_tw * np.cos(angle_ship_wind) * np.cos(angle_wind)
-    v_speed_rel_to_wind = speed_tw * np.cos(angle_ship_wind) * np.sin(angle_wind)
+    # calc speeds relative to wind
+    u_speed_rel_to_wind = u_ship_og - u_wind
+    v_speed_rel_to_wind = v_ship_og - v_wind
 
     # drag coefficients
     coeff_water_drag = vessel_maximum_engine_power / vessel_speed_calm_water ** 3
