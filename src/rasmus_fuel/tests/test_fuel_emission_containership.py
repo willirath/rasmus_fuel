@@ -93,6 +93,7 @@ def test_emission_CO2_diesel_MANandBW():
     """Check correct units of input time """
     with pytest.raises(ValueError) as execinfo:
         emission_CO2_diesel_MANandBW(
+            fuel_consumption=25.0,
             sailing_time=1.6,
         )
     assert str(execinfo.value) == 'Sailing time in seconds should be provided.'
@@ -103,12 +104,18 @@ def test_conversion_CO2_emission_CO2_diesel_MANandBW():
     with pytest.raises(ValueError) as execinfo:
         emission_CO2_diesel_MANandBW(
             vessel_conversion_factor_fuel_toCO2=-3.6,
+            fuel_consumption=25.0,
+            sailing_time=84720,
         )
         emission_CO2_diesel_MANandBW(
             vessel_conversion_factor_fuel_toCO2=1000.0,
+            fuel_consumption=25.0,
+            sailing_time=84720,
         )
         emission_CO2_diesel_MANandBW(
             vessel_conversion_factor_fuel_toCO2=0.0,
+            fuel_consumption=25.0,
+            sailing_time=84720,
         )
     assert (
         str(execinfo.value) == 'Vessel conversion factor is a positive constant, not exceeding 10.'
